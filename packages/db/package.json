@@ -1,0 +1,31 @@
+{
+  "name": "@do/db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Paylaşımlı Prisma şeması + client (web ve admin ortak veri katmanı)",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "prisma generate",
+    "db:push": "prisma db push",
+    "studio": "prisma studio",
+    "seed:admin": "tsx prisma/seed-admin.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.8.2",
+    "@vercel/blob": "^0.27.0",
+    "bcryptjs": "^3.0.2"
+  },
+  "devDependencies": {
+    "@do/config": "workspace:*",
+    "@types/node": "^22.15.21",
+    "prisma": "^6.8.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3"
+  }
+}

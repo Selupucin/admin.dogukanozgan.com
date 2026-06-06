@@ -1,0 +1,309 @@
+{
+  "common": {
+    "brand": "Doğukan Özgan",
+    "tagline": "Sigorta danışmanlığı",
+    "getQuote": "Ücretsiz Teklif Al",
+    "contact": "İletişim",
+    "toggleTheme": "Temayı değiştir",
+    "language": "Dil",
+    "whatsappPrefill": "Merhaba, sigorta teklifi almak istiyorum.",
+    "whatsappAria": "WhatsApp ile yazın",
+    "callAria": "Telefonla arayın"
+  },
+  "meta": {
+    "homeTitle": "Doğukan Özgan Sigorta — 20+ Şirketten En Uygun Teklif",
+    "homeDescription": "Trafik, sağlık, bireysel emeklilik, konut ve hayat sigortasında 20'den fazla şirketin fiyatını karşılaştırıyoruz. Şişli/İstanbul yetkili sigorta acentesi. Ücretsiz teklif alın."
+  },
+  "nav": {
+    "primary": "Ana menü",
+    "plans": "Sigorta Ürünleri",
+    "about": "Hakkımda",
+    "faq": "Sıkça Sorulanlar",
+    "contact": "İletişim",
+    "openMenu": "Menüyü aç",
+    "closeMenu": "Menüyü kapat"
+  },
+  "topbar": {
+    "trust": "Çoklu şirket acentesi — en uygun teklifi sizin için karşılaştırıyoruz",
+    "claim": "Hasar Anında"
+  },
+  "home": {
+    "heroBadge": "Bağımsız acente — 20+ şirketi karşılaştırır",
+    "heroTitle": "Sigortanızda <em>en uygun</em> teklifi birlikte bulalım.",
+    "heroSubtitle": "Trafik, sağlık, bireysel emeklilik, konut ve hayat… Tek bir şirkete bağlı değilim; 20'den fazla sigorta şirketinin fiyatını sizin için karşılaştırıyorum. Siz bilgilerinizi bırakın, en avantajlı poliçeyi ben bulayım.",
+    "heroCtaPrimary": "Hemen Teklif Al",
+    "heroCtaWhatsapp": "WhatsApp'tan Yaz",
+    "stats": {
+      "companies": "20+",
+      "companiesLabel": "Anlaşmalı şirket",
+      "experience": "Tüm branşlar",
+      "experienceLabel": "Trafikten hayata",
+      "response": "Hızlı",
+      "responseLabel": "Ortalama dönüş"
+    },
+    "trustLabel": "Anlaşmalı sigorta şirketleri",
+    "branchesEyebrow": "Sunduğum Branşlar",
+    "branchesTitle": "Her ihtiyaca özel sigorta çözümü",
+    "branchesSubtitle": "Aracınızdan sağlığınıza, evinizden geleceğinize — tüm sigortalarınız için tek adresten en uygun teklifi alın.",
+    "branchesCta": "Teklif al",
+    "stepsEyebrow": "Nasıl Çalışır",
+    "stepsTitle": "3 adımda en uygun poliçe",
+    "steps": {
+      "s1Title": "Bilgilerinizi bırakın",
+      "s1Body": "İlgili formu doldurun veya WhatsApp'tan yazın. Sadece bir-iki dakikanızı alır, hiçbir ücret yoktur.",
+      "s2Title": "Fiyatları karşılaştırayım",
+      "s2Body": "20'den fazla şirketin tekliflerini sizin için karşılaştırıp en avantajlısını bulayım.",
+      "s3Title": "Poliçeniz hazır",
+      "s3Body": "Onayınızla poliçenizi düzenleyeyim, e-posta ve WhatsApp ile anında ileteyim."
+    },
+    "faqEyebrow": "Sık Sorulanlar",
+    "faqTitle": "Aklınıza takılanlar",
+    "faqMore": "Tüm soruları görmek ister misiniz?",
+    "faqMoreLink": "SSS sayfasına gidin",
+    "finalTitle": "En uygun teklifiniz sizi bekliyor",
+    "finalSubtitle": "Bugün bilgilerinizi bırakın, en kısa sürede sizi arayıp en avantajlı poliçeyi sunayım."
+  },
+  "heroCard": {
+    "title": "Ücretsiz Teklif Al",
+    "subtitle": "Sigorta türünü seçin, ürüne özel formu birlikte dolduralım.",
+    "branchLabel": "Sigorta Türü",
+    "branchPlaceholder": "Seçiniz…",
+    "cta": "Teklifimi Hazırla",
+    "note": "Bilgileriniz yalnızca teklif amacıyla, KVKK'ya uygun şekilde işlenir."
+  },
+  "plans": {
+    "metaTitle": "Sigorta Ürünleri & Teklif Al",
+    "metaDescription": "Trafik, sağlık, bireysel emeklilik, konut ve hayat sigortası. 20+ şirketten en uygun teklifi karşılaştırın, dakikalar içinde ücretsiz teklif alın.",
+    "eyebrow": "Tüm Branşlar",
+    "heading": "Sigorta Ürünleri",
+    "subheading": "İhtiyacınıza uygun ürünü seçin, birkaç dakikada ücretsiz teklif alın. Tüm tekliflerinizi tek yerden karşılaştırıyorum.",
+    "hasCalculator": "Hesaplayıcı var",
+    "goToCalculator": "Hesaplayıcıya Git",
+    "getQuoteCta": "Teklif al",
+    "detailsCta": "İncele",
+    "brandSuffix": "Doğukan Özgan Sigorta",
+    "formHeading": "Ücretsiz Teklif Formu",
+    "formIntro": "Bilgilerinizi bırakın, size en uygun teklifi hazırlayıp dönelim. Yıldızlı (*) alanlar zorunludur.",
+    "whyEyebrow": "Neden Acente?",
+    "whyTitle": "Tek şirkete değil, size çalışan bir danışman",
+    "whySubtitle": "Bağımsız acente olarak 20'den fazla şirketin fiyatını sizin için karşılaştırır, en avantajlı poliçeyi tarafsızca öneririm.",
+    "why1Title": "20+ şirketi karşılaştırın",
+    "why1Body": "Tek tek sitelerde dolaşmadan, tüm tekliflerinizi tek noktadan değerlendirin.",
+    "why2Title": "Ücretsiz ve bağlayıcı değil",
+    "why2Body": "Teklif almak hiçbir ücret gerektirmez ve sizi bağlamaz.",
+    "why3Title": "Hasar anında yanınızda",
+    "why3Body": "Poliçe sonrası süreçte de ilgili şirketle iletişimi sizin adınıza yönetirim.",
+    "stepsEyebrow": "Nasıl Çalışır",
+    "stepsTitle": "3 adımda en uygun poliçe",
+    "trustTitle": "Anlaşmalı şirketlerle güvenli karşılaştırma",
+    "trustSubtitle": "Türkiye'nin önde gelen sigorta şirketleriyle çalışıyorum; fiyatları sizin için tarafsızca karşılaştırırım.",
+    "faqEyebrow": "Sık Sorulanlar",
+    "faqTitle": "Aklınıza takılanlar",
+    "finalTitle": "Hangi sigortaya ihtiyacınız var?",
+    "finalSubtitle": "Branşı seçin, ürün sayfasından dakikalar içinde ücretsiz teklif alın."
+  },
+  "productPage": {
+    "coverageEyebrow": "Kapsam",
+    "coverageTitle": "Neyi kapsar?",
+    "advantagesEyebrow": "Avantajlar",
+    "advantagesTitle": "Bu ürünün öne çıkanları",
+    "whyEyebrow": "Neden Doğukan ile?",
+    "whyTitle": "Güvenle, tarafsızca, yanınızda",
+    "calculatorEyebrow": "Hesaplayıcı",
+    "faqEyebrow": "Sık Sorulanlar",
+    "faqTitle": "Bu ürün hakkında",
+    "ctaTitle": "Bu sigorta için teklif alın",
+    "ctaSubtitle": "Birkaç dakikada ücretsiz teklif formunu doldurun; size en uygun poliçeyle dönelim.",
+    "getQuote": "Teklif Al",
+    "backToInfo": "Ürün bilgisine dön",
+    "calcToQuote": "Bu değerlerle teklif al"
+  },
+  "quotePage": {
+    "metaSuffix": "Teklif Al",
+    "metaDescription": "{product} için birkaç dakikada ücretsiz teklif alın. Bilgilerinizi bırakın, en uygun poliçeyi karşılaştırıp dönelim.",
+    "eyebrow": "Ücretsiz Teklif",
+    "back": "{product} bilgisine dön"
+  },
+  "about": {
+    "metaTitle": "Hakkımda",
+    "metaDescription": "Doğukan Özgan — Şişli/İstanbul merkezli bağımsız sigorta acentesi. Çoklu şirket acenteliğiyle her branşta en uygun teklifi karşılaştırır.",
+    "eyebrow": "Hakkımda",
+    "heading": "Sigortada güveniniz, yanınızdaki danışman",
+    "intro": "Merhaba, ben Doğukan Özgan. Tek bir sigorta şirketine değil, sizin ihtiyacınıza bağlı çalışan bağımsız bir sigorta danışmanıyım.",
+    "p1": "Trafik ve kaskodan sağlığa, bireysel emeklilikten konut ve hayat sigortasına kadar geniş bir yelpazede hizmet veriyorum. Onlarca sigorta şirketinin tekliflerini tek tek karşılaştırarak, bütçenize ve beklentinize en uygun poliçeyi sizin için buluyorum.",
+    "p2": "Amacım sadece poliçe satmak değil; doğru teminatı, anlaşılır bir dille anlatmak ve hasar anında yanınızda olmak. Süreci baştan sona takip ediyor, ilgili sigorta şirketiyle iletişimi sizin adınıza yönetiyorum.",
+    "p3": "Mecidiyeköy / Şişli'deki ofisimden tüm Türkiye'ye uzaktan da hizmet veriyorum. Bir soru, bir teklif ya da mevcut poliçeniz için ikinci bir görüş; her zaman bir telefon ya da WhatsApp mesajı kadar yakınım.",
+    "valuesLabel": "Neden benimle çalışmalısınız?",
+    "v1Title": "Bağımsız & tarafsız",
+    "v1Body": "Tek bir şirkete bağlı değilim. 20'den fazla şirketi karşılaştırıp sizin için en uygununu öneririm.",
+    "v2Title": "Şeffaf süreç",
+    "v2Body": "Teminatları ve istisnaları sade bir dille anlatırım; sürpriz madde olmaz.",
+    "v3Title": "Hızlı dönüş",
+    "v3Body": "Talebinizi aldıktan sonra en kısa sürede arar veya WhatsApp'tan dönüş yaparım.",
+    "v4Title": "Hasar anında yanınızda",
+    "v4Body": "Poliçenizi satıp bırakmam; hasar sürecini sizin adınıza baştan sona takip ederim.",
+    "storyLabel": "Hikâyem & deneyimim",
+    "story1": "Yıllardır sigorta sektöründe, müşterinin yanında duran bir danışman olarak çalışıyorum. Bu süre içinde gördüm ki insanların asıl ihtiyacı poliçe değil; doğru soruları soran, teminatı sade anlatan ve gerektiğinde arkasında duran biri.",
+    "story2": "Bu yüzden tek bir şirkete bağlı kalmak yerine bağımsız acentelik yolunu seçtim. Böylece sizin çıkarınızı merkeze alıp piyasadaki seçenekleri tarafsızca karşılaştırabiliyorum.",
+    "approachLabel": "Çalışma yaklaşımım",
+    "approachBody": "Önce dinlerim: ihtiyacınızı, bütçenizi ve önceliklerinizi anlamadan teklif sunmam. Sonra seçenekleri sade bir dille karşılaştırır, kararı size bırakırım. Satıştan sonra da süreçte yanınızdayım.",
+    "branchesLabel": "Hizmet verdiğim branşlar",
+    "branchesBody": "Aracınızdan sağlığınıza, evinizden geleceğinize kadar tüm temel sigorta ihtiyaçlarınızda yanınızdayım.",
+    "companiesLabel": "Anlaşmalı şirketler",
+    "companiesBody": "Türkiye'nin önde gelen sigorta şirketleriyle çalışıyorum; fiyatları sizin için tarafsızca karşılaştırırım.",
+    "processLabel": "Nasıl çalışırım?",
+    "stats": {
+      "companies": "20+",
+      "companiesLabel": "Anlaşmalı şirket",
+      "branches": "Tüm branşlar",
+      "branchesLabel": "Trafikten hayata",
+      "independent": "Bağımsız",
+      "independentLabel": "Tarafsız danışmanlık"
+    },
+    "ctaTitle": "Sigortanızı birlikte planlayalım"
+  },
+  "contact": {
+    "metaTitle": "İletişim",
+    "metaDescription": "Doğukan Özgan sigorta acentesi iletişim: telefon, WhatsApp, e-posta ve Mecidiyeköy / Şişli İstanbul ofis adresi. Geri arama talebi bırakın.",
+    "eyebrow": "İletişim",
+    "heading": "Bize ulaşın, en uygun teklifi konuşalım",
+    "intro": "Telefon, WhatsApp veya e-posta ile bana ulaşabilir; dilerseniz aşağıdan geri arama talebi bırakabilirsiniz. En kısa sürede dönüş yaparım.",
+    "phoneTitle": "Telefon",
+    "whatsappTitle": "WhatsApp",
+    "emailTitle": "E-posta",
+    "addressTitle": "Ofis Adresi",
+    "hours": "Hafta içi 09:00 – 18:00",
+    "openMap": "Haritada Aç",
+    "mapTitle": "Ofis konumu haritası",
+    "formTitle": "Geri arama talebi",
+    "formIntro": "Bilgilerinizi bırakın, sizi en kısa sürede arayayım.",
+    "formName": "Ad Soyad",
+    "formNamePlaceholder": "Adınız ve soyadınız",
+    "formPhone": "Telefon",
+    "formPhonePlaceholder": "05xx xxx xx xx",
+    "formEmail": "E-posta (opsiyonel)",
+    "formEmailPlaceholder": "ornek@eposta.com",
+    "formSubject": "Konu",
+    "formSubjectPlaceholder": "Örn. Sağlık sigortası teklifi",
+    "formMessage": "Mesajınız (opsiyonel)",
+    "formMessagePlaceholder": "Kısaca ihtiyacınızı yazabilirsiniz",
+    "formWhatsappHint": "Bu form, mesajınızı WhatsApp üzerinden iletmek için hazırlanır. Gönder'e bastığınızda WhatsApp açılır.",
+    "formSubmit": "WhatsApp'tan Gönder",
+    "formNote": "Bilgileriniz yalnızca size dönüş yapmak amacıyla kullanılır."
+  },
+  "faqPage": {
+    "metaTitle": "Sıkça Sorulan Sorular",
+    "metaDescription": "Sigorta teklifi, çalıştığım şirketler, veri güvenliği, poliçe yenileme ve hasar süreci hakkında sıkça sorulan sorular ve yanıtları.",
+    "eyebrow": "Sıkça Sorulanlar",
+    "heading": "Sıkça sorulan sorular",
+    "intro": "Aklınıza takılan başka bir şey olursa telefon veya WhatsApp ile bana her zaman ulaşabilirsiniz.",
+    "ctaTitle": "Sorunuza yanıt bulamadınız mı?",
+    "ctaBody": "Bana doğrudan ulaşın, ihtiyacınıza özel yardımcı olayım.",
+    "ctaButton": "İletişime Geç"
+  },
+  "footer": {
+    "about": "Çoklu şirket acenteliğiyle, her branşta en uygun teklifi sizin için karşılaştıran bağımsız sigorta danışmanı. Şişli / İstanbul.",
+    "branches": "Branşlar",
+    "corporate": "Kurumsal",
+    "viewOnMap": "Haritada Gör",
+    "rights": "Tüm hakları saklıdır.",
+    "agencyNote": "Yetkili sigorta acentesi · KVKK'ya uygun veri işleme",
+    "links": {
+      "about": "Hakkımda",
+      "faq": "Sıkça Sorulanlar",
+      "contact": "İletişim",
+      "kvkk": "KVKK Aydınlatma Metni",
+      "privacy": "Gizlilik Politikası",
+      "cookies": "Çerez Politikası"
+    }
+  },
+  "form": {
+    "submit": "Teklif Talebi Gönder",
+    "submitting": "Gönderiliyor…",
+    "submitAnother": "Yeni talep gönder",
+    "successTitle": "Talebiniz alındı",
+    "successBody": "En kısa sürede size en uygun teklifle dönüş yapacağız.",
+    "kvkkConsent": "Kişisel verilerimin teklif amacıyla işlenmesini kabul ediyorum.",
+    "kvkkLink": "KVKK Aydınlatma Metni'ni oku",
+    "sensitiveConsent": "Sağlık durumuma ilişkin özel nitelikli kişisel verilerimin işlenmesine açık rıza veriyorum.",
+    "sensitiveLink": "Açık Rıza Metni'ni oku",
+    "consentModal": {
+      "kvkkTitle": "KVKK Aydınlatma Metni",
+      "sensitiveTitle": "Özel Nitelikli Veri — Açık Rıza Metni",
+      "confirm": "Okudum ve onaylıyorum",
+      "scrollHint": "Onaylamadan önce metni açıp en alta kadar okumanız gerekir.",
+      "close": "Kapat"
+    },
+    "errors": {
+      "rateLimited": "Çok sayıda deneme yaptınız. Lütfen bir süre sonra tekrar deneyin.",
+      "unknownProduct": "Ürün bulunamadı. Sayfayı yenileyip tekrar deneyin.",
+      "validation": "Lütfen formdaki işaretli alanları kontrol edin.",
+      "consentRequired": "Devam etmek için KVKK aydınlatma onayını işaretlemelisiniz.",
+      "sensitiveConsentRequired": "Sağlık verileriniz için ayrıca açık rıza vermeniz gerekir.",
+      "server": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
+    }
+  },
+  "cookie": {
+    "message": "Sitemizde, deneyiminizi iyileştirmek için zorunlu çerezler kullanırız. Zorunlu olmayan (örn. analitik) çerezler yalnızca onayınızla çalışır.",
+    "accept": "Tümünü kabul et",
+    "reject": "Yalnızca zorunlu",
+    "policyLink": "Çerez Politikası"
+  },
+  "legal": {
+    "draftNotice": "Bu metin TASLAKTIR. Nihai içerik bir hukukçu / KVKK danışmanı tarafından onaylanmadan yayımlanmamalıdır.",
+    "lastUpdated": "Son güncelleme",
+    "kvkk": {
+      "title": "KVKK Aydınlatma Metni",
+      "metaDescription": "6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin aydınlatma metni."
+    },
+    "privacy": {
+      "title": "Gizlilik Politikası",
+      "metaDescription": "Kişisel verilerinizin nasıl toplandığı, kullanıldığı ve korunduğuna ilişkin gizlilik politikası."
+    },
+    "cookies": {
+      "title": "Çerez Politikası",
+      "metaDescription": "Sitemizde kullanılan çerezler, türleri ve çerez tercihlerinizi nasıl yönetebileceğiniz."
+    }
+  },
+  "calculator": {
+    "estimateNotice": "Tahmini değerdir, kesin teklif için aşağıdaki formu doldurun.",
+    "estimateNoticeStrong": "Bu bir tahmindir.",
+    "useInForm": "Bu değerlerle teklif al",
+    "usedInFormNotice": "Hesaplayıcı değerleri aşağıdaki forma aktarıldı.",
+    "perMonth": "/ ay",
+    "perYear": "/ yıl",
+    "approx": "yaklaşık",
+    "bes": {
+      "title": "BES Birikim Hesaplayıcı",
+      "intro": "Aylık ödemenize ve süreye göre devlet katkısı dahil yaklaşık birikiminizi hesaplayın.",
+      "monthly": "Aylık katkı (TL)",
+      "years": "Süre (yıl)",
+      "returnRate": "Tahmini yıllık getiri (%)",
+      "resultTotal": "Tahmini toplam birikim",
+      "resultContributions": "Yatırdığınız ana para",
+      "resultState": "Devlet katkısı (%30)"
+    },
+    "saglik": {
+      "title": "Sağlık Sigortası Prim Tahmini",
+      "intro": "Yaş ve kapsamınıza göre yaklaşık aylık/yıllık prim aralığını görün.",
+      "age": "Yaş",
+      "sgk": "SGK'lıyım (Tamamlayıcı / TSS)",
+      "coverage": "Kapsam",
+      "coverageIndividual": "Bireysel",
+      "coverageFamily": "Aile",
+      "people": "Kişi sayısı (aile)",
+      "resultMonthly": "Tahmini aylık prim aralığı",
+      "resultAnnual": "Tahmini yıllık prim aralığı"
+    },
+    "hayat": {
+      "title": "Hayat Sigortası Prim Tahmini",
+      "intro": "Teminat tutarı, süre ve yaşınıza göre yaklaşık primi hesaplayın.",
+      "age": "Yaş",
+      "coverage": "Teminat tutarı (TL)",
+      "years": "Süre (yıl)",
+      "smoker": "Sigara kullanıyorum",
+      "resultMonthly": "Tahmini aylık prim aralığı",
+      "resultAnnual": "Tahmini yıllık prim aralığı"
+    }
+  }
+}

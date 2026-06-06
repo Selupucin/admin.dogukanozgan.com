@@ -1,0 +1,34 @@
+{
+  "name": "dogukanozgan",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Doğukan Özgan — çoklu şirket sigorta acentesi web platformu (monorepo)",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "db:generate": "pnpm --filter @do/db generate",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@do/config": "workspace:*",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs,json,md,css}": [
+      "prettier --write"
+    ]
+  }
+}

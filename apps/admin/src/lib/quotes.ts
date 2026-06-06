@@ -1,0 +1,99 @@
+// Teklif veri erişimi (Prisma sorguları) — liste, özet, detay.
+// Kaynak: docs/04 (QuoteRequest/Note/Asset), docs/05 (liste filtreleri, özet kartları).
+//
+// ⚠️ Gerçek DB henüz yok → bu sorgular derlenir ama çalışma zamanı testi Aşama 6'da.
+
+import { prisma, type Prisma, type QuoteStatus } from "@do/db";
+
+export interface QuoteFilters {
+  product?: string;
+  status?: QuoteStatus;
+  /** Başlangıç tarihi (dahil). */
+  from?: Date;
+  /** Bitiş tarihi (dahil — gün sonuna kadar). */
+  to?: Date;
+  /** Ad veya telefonda arama. */
+  search?: string;
+}
+
+/** Filtreleri Prisma where koşuluna çevirir. */
+function buildWhere(filters: QuoteFilters): Prisma.QuoteRequestWhereInput {
+  const where: Prisma.QuoteRequestWhereInput = {};
+
+  if (filters.product) where.product = filters.product;
+  if (filters.status) where.status = filters.status;
+
+  if (filters.from || filters.to) {
+    where.createdAt = {};
+    if (filters.from) where.createdAt.gte = filters.from;
+    if (filters.to) where.createdAt.lte = filters.to;
+  }
+
+  if (filters.search && filters.search.trim()) {
+    const q = filters.search.trim();
+    where.OR = [
+      { fullName: { contains: q, mode: "insensitive" } },
+      { phone: { contains: q } },
+      { email: { contains: q, mode: "insensitive" } },
+    ];
+  }
+
+  return where;
+}
+
+/** Filtrelenmiş teklif listesi (en yeni üstte). */
+export async function listQuotes(filters: QuoteFilters) {
+  return prisma.quoteRequest.findMany({
+    where: buildWhere(filters),
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      product: true,
+      fullName: true,
+      phone: true,
+      email: true,
+      status: true,
+      createdAt: true,
+      _count: { select: { notes: true, assets: true } },
+    },
+  });
+}
+
+export interface QuoteSummary {
+  total: number;
+  yeni: number;
+  buHafta: number;
+  donusum: number;
+}
+
+/** Üst özet kartları (docs/05: Toplam · Yeni · Bu hafta · Dönüşüm). */
+export async function getSummary(): Promise<QuoteSummary> {
+  const startOfWeek = new Date();
+  // Pazartesi başlangıçlı haftanın başı (00:00).
+  const day = (startOfWeek.getDay() + 6) % 7; // Pazartesi=0
+  startOfWeek.setDate(startOfWeek.getDate() - day);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const [total, yeni, buHafta, donusum] = await Promise.all([
+    prisma.quoteRequest.count(),
+    prisma.quoteRequest.count({ where: { status: "YENI" } }),
+    prisma.quoteRequest.count({ where: { createdAt: { gte: startOfWeek } } }),
+    prisma.quoteRequest.count({ where: { status: "POLICE_YAPILDI" } }),
+  ]);
+
+  return { total, yeni, buHafta, donusum };
+}
+
+/** Tek teklif detayı (notlar + asset'ler dahil). */
+export async function getQuote(id: string) {
+  return prisma.quoteRequest.findUnique({
+    where: { id },
+    include: {
+      notes: { orderBy: { createdAt: "desc" } },
+      assets: { orderBy: { createdAt: "asc" } },
+    },
+  });
+}
+
+export type QuoteListItem = Awaited<ReturnType<typeof listQuotes>>[number];
+export type QuoteDetail = NonNullable<Awaited<ReturnType<typeof getQuote>>>;

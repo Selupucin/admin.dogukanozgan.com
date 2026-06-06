@@ -1,0 +1,18 @@
+# Vercel deploy'una GEREKSİZ dosyalar (apps/web ve apps/admin build'ini etkilemez).
+# Not: apps/ ve packages/ KALIR — uygulama ve workspace bağımlılıkları gereklidir.
+
+# Dökümantasyon & teslim (deploy'da kullanılmaz)
+docs/
+teslim/
+
+# Geliştirme araçları (sub-agent tanımları, hook'lar, git hook kaynakları)
+.claude/
+.husky/
+
+# Kök markdown'lar (README hariç) deploy'a gerekmez
+*.md
+!README.md
+
+# Yerel/derleme artefaktları (zaten .gitignore'da ama deploy upload'ı için de hariç)
+.turbo/
+**/*.tsbuildinfo

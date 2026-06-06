@@ -1,0 +1,171 @@
+/*
+ * @do/ui — paylaşılan global stiller + tasarım token'ları.
+ * Kaynak: docs/09 (renk paleti, tipografi). Renkler CSS custom properties ile
+ * tek yerden yönetilir; dark mode varyantı `.dark` altında türetilir.
+ *
+ * NOT: Dark mode renkleri docs/09'daki "lacivert zemin + açık metin, turuncu/teal
+ * aksanlar korunur" yönüne göre türetilmiş ilk taslaktır.
+ * TODO(doc): docs/09 "Dark mode renk varyantları" netleşince ince ayar.
+ *
+ * Fontlar (Fraunces + Hanken Grotesk) her app'te next/font ile yüklenir ve
+ * --font-heading / --font-body değişkenlerine bağlanır.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* --- docs/09 ham palet (HEX referans) ---
+       navy #10243a · soft-ink #3a5168 · cream #f7f2e9 · cream-deep #efe6d6
+       paper #fffdf8 · cta #f25a32 · cta-dark #d9421b · teal #1c6e6a · teal-soft #e3efed */
+
+    /* Token'lar HSL üçlüsü olarak (shadcn/ui konvansiyonu: "H S% L%"). */
+
+    /* Zemin & metin */
+    --background: 39 47% 94%; /* cream #f7f2e9 */
+    --foreground: 210 56% 15%; /* navy #10243a */
+
+    /* Kart / kağıt */
+    --card: 45 100% 99%; /* paper #fffdf8 */
+    --card-foreground: 210 56% 15%;
+    --popover: 45 100% 99%;
+    --popover-foreground: 210 56% 15%;
+
+    /* Birincil = CTA turuncu */
+    --primary: 13 88% 57%; /* cta #f25a32 */
+    --primary-foreground: 45 100% 99%;
+
+    /* İkincil = güven aksanı teal */
+    --secondary: 177 60% 27%; /* teal #1c6e6a */
+    --secondary-foreground: 45 100% 99%;
+
+    /* Vurgu yumuşak (teal soft — rozet/ikon zemini) */
+    --accent: 168 33% 91%; /* teal-soft #e3efed */
+    --accent-foreground: 177 60% 27%;
+
+    /* Yardımcı / boğuk metin */
+    --muted: 38 41% 89%; /* cream-deep #efe6d6 */
+    --muted-foreground: 210 30% 32%; /* soft-ink #3a5168 */
+
+    /* Durum */
+    --destructive: 9 78% 48%; /* cta-dark #d9421b */
+    --destructive-foreground: 45 100% 99%;
+
+    /* Çizgi / girdi / focus ring (odakta teal halka — docs/09) */
+    --border: 38 41% 84%;
+    --input: 38 41% 84%;
+    --ring: 177 60% 27%; /* teal */
+
+    /* Kart köşe yarıçapı (docs/09: ~18px) */
+    --radius: 1.125rem;
+  }
+
+  .dark {
+    /* Lacivert zemin + açık metin; turuncu/teal aksanlar korunur (docs/09). */
+    --background: 210 56% 11%; /* koyu navy */
+    --foreground: 39 47% 94%; /* cream metin */
+
+    --card: 210 50% 15%;
+    --card-foreground: 39 47% 94%;
+    --popover: 210 50% 15%;
+    --popover-foreground: 39 47% 94%;
+
+    --primary: 13 88% 57%; /* turuncu korunur */
+    --primary-foreground: 45 100% 99%;
+
+    --secondary: 177 45% 40%; /* teal biraz açık */
+    --secondary-foreground: 45 100% 99%;
+
+    --accent: 177 35% 22%;
+    --accent-foreground: 168 33% 91%;
+
+    --muted: 210 40% 20%;
+    --muted-foreground: 210 25% 70%;
+
+    --destructive: 9 78% 52%;
+    --destructive-foreground: 45 100% 99%;
+
+    --border: 210 35% 24%;
+    --input: 210 35% 24%;
+    --ring: 177 45% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Görünüme girince yumuşak "rise" animasyonu (docs/09 mikro-etkileşim).
+     Kademeli gecikme için .reveal-1..5 yardımcıları. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: do-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+  .reveal-1 {
+    animation-delay: 0.05s;
+  }
+  .reveal-2 {
+    animation-delay: 0.15s;
+  }
+  .reveal-3 {
+    animation-delay: 0.25s;
+  }
+  .reveal-4 {
+    animation-delay: 0.35s;
+  }
+  .reveal-5 {
+    animation-delay: 0.45s;
+  }
+  @keyframes do-rise {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* İnce grain/noise doku katmanı (docs/09 "Dokular"). */
+  .grain-overlay::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Erişilebilirlik: hareketi azalt (docs/09 — prefers-reduced-motion). */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

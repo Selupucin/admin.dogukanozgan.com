@@ -1,0 +1,30 @@
+{
+  "name": "@do/config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Paylaşımlı kod kalitesi tabanları: ESLint + Prettier + tsconfig (K24)",
+  "type": "module",
+  "files": [
+    "eslint",
+    "tsconfig",
+    "prettier.config.js"
+  ],
+  "exports": {
+    "./eslint/base": "./eslint/base.js",
+    "./eslint/next": "./eslint/next.js",
+    "./prettier": "./prettier.config.js",
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/next.json": "./tsconfig/next.json"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "globals": "^16.2.0",
+    "typescript-eslint": "^8.33.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}

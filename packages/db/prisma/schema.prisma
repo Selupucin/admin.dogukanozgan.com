@@ -1,0 +1,118 @@
+// dogukanozgan.com — Prisma şeması (ortak veri katmanı)
+// Kaynak: docs/04-veri-modeli.md. Yaklaşım B: ortak alanlar gerçek alan,
+// ürüne özel değişken alanlar `payload` (JSON) içinde tutulur.
+//
+// VERİTABANI: MongoDB Atlas (Prisma `mongodb` provider) — K25 (kullanıcı kararı,
+// Supabase/PostgreSQL'den geçiş). ID'ler ObjectId; yabancı anahtarlar @db.ObjectId.
+//
+// NOT: DB bağlantısı henüz yok (MongoDB Atlas bağlantısı bekleniyor) → şema cluster'a
+// uygulanmadı. Sadece `prisma generate` ile client üretilir.
+//
+// ŞEMA UYGULAMA (gerçek MongoDB bağlanınca, packages/db içinde çalıştırılacak):
+//   pnpm --filter @do/db db:push        # = prisma db push
+// MongoDB'de SQL migration dosyaları YOKTUR (`prisma migrate` PostgreSQL'e özgüydü);
+// şema doğrudan `db push` ile senkronlanır.
+// Dosya depolama: Vercel Blob (bkz. src/storage.ts) — bucket/policy gerekmez.
+//
+// Aşama 2 NOTU: Teklif akışı + KVKK rıza kanıtı + dosya yükleme + silme/anonimleştirme
+// ŞEMA DEĞİŞİKLİĞİ GEREKTİRMEDİ (mevcut QuoteRequest/Asset alanları yeterli).
+//
+// Aşama 3 NOTU (admin auth): User modeline `passwordHash` (bcrypt) alanı eklendi —
+// docs/05 "Şifreler hash'lenir". Auth.js Credentials + JWT oturumu kullanılır;
+// adapter (Account/Session tabloları) GEREKMEZ.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Gelen teklif talepleri
+model QuoteRequest {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  product String // ürün slug: "trafik" | "saglik" | "bireysel-emeklilik" | "konut" ...
+  locale  String @default("tr") // formun doldurulduğu dil
+
+  // Ortak iletişim alanları (sorgulanabilir olsun diye gerçek alan)
+  fullName String
+  phone    String
+  email    String?
+
+  // Ürüne özel tüm alanlar (TC, plaka, m², yaş, kronik hastalık vb.)
+  payload Json
+
+  // KVKK rıza kayıtları (kanıt için ZORUNLU — bkz. docs/06)
+  consentKvkk      Boolean   @default(false)
+  consentSensitive Boolean   @default(false) // sağlık verisi vb. için ayrı rıza
+  consentAt        DateTime?
+  consentIp        String?
+  consentUserAgent String?
+
+  // CRM alanları
+  status QuoteStatus @default(YENI)
+  notes  Note[]
+  assets Asset[] // yüklenen fotoğraf/dosyalar (örn. trafikte ruhsat)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([product])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// CRM durum akışı
+enum QuoteStatus {
+  YENI // Yeni geldi
+  ARANDI // İletişime geçildi
+  TEKLIF_VERILDI // Teklif sunuldu
+  POLICE_YAPILDI // Satışa dönüştü
+  IPTAL // Vazgeçildi / ulaşılamadı
+}
+
+// Admin'in talebe eklediği notlar (CRM)
+model Note {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  quote     QuoteRequest @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  quoteId   String       @db.ObjectId
+  body      String
+  createdAt DateTime     @default(now())
+}
+
+// Admin kullanıcılar (Auth.js)
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  name         String?
+  // Şifre HASH'i (bcrypt). docs/05 "Şifreler hash'lenir". Auth.js Credentials
+  // provider bunu doğrular. Nullable: ileride OAuth/adapter kullanıcısı eklenirse
+  // şifresiz hesap mümkün olsun (şimdilik tek credentials admin).
+  passwordHash String?
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+  // Auth.js JWT oturumu kullanılır (Aşama 3) → Account/Session tablosu GEREKMEZ.
+  // İleride DB session/OAuth istenirse adapter + bu tablolar eklenir.
+}
+
+enum Role {
+  ADMIN
+}
+
+// Yüklenen dosya/fotoğraflar (Vercel Blob referansı)
+// Birincil kullanım: TRAFİK sigortasında müşteriden istenen ruhsat/araç fotoğrafları.
+model Asset {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  path      String // Vercel Blob pathname (silme için kullanılır)
+  url       String // Blob URL (tahmin-edilemez token; doğrudan erişilir — docs/06 KVKK notu)
+  kind      String        @default("ruhsat") // "ruhsat" | "arac" | "belge" ...
+  mimeType  String?
+  sizeBytes Int?
+  quote     QuoteRequest? @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  quoteId   String?       @db.ObjectId // hangi teklife ait
+  createdAt DateTime      @default(now())
+
+  @@index([quoteId])
+}

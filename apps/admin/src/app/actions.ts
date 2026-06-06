@@ -1,0 +1,8 @@
+"use server";
+
+// Genel admin Server Action'ları (oturum kapatma).
+import { signOut } from "@/auth";
+
+export async function signOutAction() {
+  await signOut({ redirectTo: "/login" });
+}
