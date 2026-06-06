@@ -16,7 +16,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "db:generate": "pnpm --filter @do/db generate",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "@do/config": "workspace:*",

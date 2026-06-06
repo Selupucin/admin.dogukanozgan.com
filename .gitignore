@@ -52,8 +52,13 @@ lerna-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# --- Husky kurulum çıktısı (kaynak .husky/ commit edilir) ---
-.husky/_/
+# --- Geliştirme/doküman dosyaları — GitHub'a/Vercel'e GEREKMEZ (yerelde tutulur) ---
+# Bunlar yalnızca geliştirme + dökümantasyon içindir; Vercel build'i kullanmaz.
+docs/
+teslim/
+.claude/
+CLAUDE.md
+.husky/
 
 # --- Editörler ---
 .vscode/*
