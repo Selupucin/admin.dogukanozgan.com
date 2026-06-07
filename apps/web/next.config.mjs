@@ -1,6 +1,7 @@
 import createNextIntlPlugin from "next-intl/plugin";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -60,7 +61,13 @@ const nextConfig = {
   // pnpm monorepo'da Prisma query engine'i serverless fonksiyona kopyalanabilsin diye
   // dosya-izleme kökü monorepo köküne; @prisma/client harici (node_modules'tan yüklenir).
   outputFileTracingRoot: path.join(__dirname, "../../"),
-  serverExternalPackages: ["@prisma/client", ".prisma/client"],
+  webpack: (config, { isServer }) => {
+    // pnpm monorepo'da Prisma query engine'ini server bundle'ına kopyalar (resmi çözüm).
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()];
+    }
+    return config;
+  },
   async redirects() {
     return legacyRedirects;
   },
