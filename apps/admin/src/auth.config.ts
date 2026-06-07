@@ -11,6 +11,10 @@ import type { NextAuthConfig } from "next-auth";
 export const authConfig: NextAuthConfig = {
   session: { strategy: "jwt" },
   trustHost: true,
+  // Secret açıkça bağlanır: Auth.js v5 normalde AUTH_SECRET'i otomatik okur; burada
+  // hem AUTH_SECRET hem (v4 adı) NEXTAUTH_SECRET kabul edilerek isim karışıklığı önlenir.
+  // Bu ayar hem middleware (auth.config) hem auth.ts (spread) tarafından kullanılır.
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
   },
