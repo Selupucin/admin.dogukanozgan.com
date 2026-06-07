@@ -86,6 +86,9 @@ export async function getSummary(): Promise<QuoteSummary> {
 
 /** Tek teklif detayı (notlar + asset'ler dahil). */
 export async function getQuote(id: string) {
+  // MongoDB ObjectId 24 hex hane olmalı; değilse Prisma "Malformed ObjectID" fırlatır
+  // ve sayfa yanıltıcı "DB'ye ulaşılamadı" gösterir. Geçersizse null → notFound.
+  if (!/^[a-f0-9]{24}$/i.test(id)) return null;
   return prisma.quoteRequest.findUnique({
     where: { id },
     include: {

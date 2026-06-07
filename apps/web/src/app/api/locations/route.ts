@@ -15,9 +15,10 @@ import { NextResponse } from "next/server";
 import { getProvinces, getDistricts } from "@do/products/locations";
 import { getNeighborhoods } from "@do/products/locations/neighborhoods";
 
-// Statik veri → tam statik/edge dostu; uzun cache.
-export const dynamic = "force-static";
-export const revalidate = false;
+// DİNAMİK: bu route searchParams (districtId/provinceId) okur. force-static olursa bu
+// parametreler çalışma anında BOŞ gelir → mahalle/ilçe dönmez (bug). Yanıtlar yine de
+// CDN'de uzun süre cache'lenir (aşağıdaki Cache-Control header ile).
+export const dynamic = "force-dynamic";
 
 const CACHE_HEADERS = {
   "Cache-Control": "public, max-age=86400, s-maxage=604800, immutable",

@@ -50,9 +50,10 @@ export default async function TeklifDetayPage({ params }: { params: Promise<{ id
       <main className="mx-auto max-w-4xl px-6 py-8">
         <BackLink />
         <Card className="mt-6 py-12 text-center">
-          <p className="font-heading text-lg font-semibold">Veritabanına ulaşılamadı</p>
+          <p className="font-heading text-lg font-semibold">Kayıt yüklenemedi</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Bağlantı yapılandırması eksik olabilir (Aşama 6&apos;da bağlanacak).
+            Veritabanına geçici olarak ulaşılamadı. Lütfen sayfayı yenileyin; sorun sürerse bağlantı
+            (DATABASE_URL) ayarını kontrol edin.
           </p>
         </Card>
       </main>
