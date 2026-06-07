@@ -188,11 +188,28 @@
     "formEmailPlaceholder": "you@example.com",
     "formSubject": "Subject",
     "formSubjectPlaceholder": "e.g. Health insurance quote",
-    "formMessage": "Your message (optional)",
+    "formMessage": "Your message",
     "formMessagePlaceholder": "Briefly describe what you need",
-    "formWhatsappHint": "This form is prepared to send your message via WhatsApp. When you press Send, WhatsApp will open.",
-    "formSubmit": "Send via WhatsApp",
-    "formNote": "Your details are used only to get back to you."
+    "formWhatsappHint": "If you'd rather chat right away, you can also send the form via WhatsApp.",
+    "formSubmit": "Send Callback Request",
+    "formSubmitting": "Sending…",
+    "formWhatsappAlt": "Message on WhatsApp",
+    "formNote": "Your details are used only to get back to you, processed in line with KVKK.",
+    "kvkkConsent": "I consent to the processing of my personal data for the purpose of getting back to me.",
+    "kvkkLink": "read the Privacy (KVKK) Notice",
+    "successTitle": "Your request was received",
+    "successBody": "Your callback request has reached us. We'll get in touch with you as soon as possible.",
+    "submitAnother": "Send another request",
+    "errors": {
+      "rateLimited": "Too many attempts. Please try again later.",
+      "validation": "Please review the highlighted fields in the form.",
+      "consentRequired": "You must accept the privacy (KVKK) notice to continue.",
+      "server": "An unexpected error occurred. Please try again.",
+      "fullName": "Please enter your full name.",
+      "phone": "Please enter a valid phone number.",
+      "email": "Please enter a valid email.",
+      "message": "Please write a short message."
+    }
   },
   "faqPage": {
     "metaTitle": "Frequently Asked Questions",
@@ -203,6 +220,38 @@
     "ctaTitle": "Didn't find the answer to your question?",
     "ctaBody": "Reach out to me directly and I'll help with your specific needs.",
     "ctaButton": "Get in Touch"
+  },
+  "quoteStatus": {
+    "metaTitle": "Check Quote Status",
+    "metaDescription": "Enter the tracking code you were given for your quote request to see the current status of your quote.",
+    "navLabel": "Quote Status",
+    "eyebrow": "Quote Tracking",
+    "heading": "Check the status of your quote",
+    "intro": "Enter the tracking code you received after your quote request to see its current status here.",
+    "codeLabel": "Tracking code",
+    "codePlaceholder": "e.g. ABCD234XYZ",
+    "submit": "Check Status",
+    "submitting": "Checking…",
+    "resultTitle": "Quote status",
+    "product": "Insurance product",
+    "status": "Status",
+    "createdAt": "Request date",
+    "policyEndDate": "Policy end date",
+    "privacyNote": "For your privacy, only the product, status and date are shown. None of your personal details are shared here.",
+    "newSearch": "Check another code",
+    "statuses": {
+      "YENI": "Your request was received",
+      "ARANDI": "We've been in touch with you",
+      "TEKLIF_VERILDI": "Your quote has been prepared",
+      "POLICE_YAPILDI": "Your policy has been issued",
+      "IPTAL": "Request closed"
+    },
+    "errors": {
+      "rateLimited": "Too many attempts. Please try again later.",
+      "notFound": "No quote was found for this code. Please check the code and try again.",
+      "invalid": "Please enter a valid tracking code.",
+      "server": "An unexpected error occurred. Please try again."
+    }
   },
   "footer": {
     "about": "An independent insurance advisor who compares the most suitable offer for you in every branch, with multi-company agency. Şişli / İstanbul.",
@@ -215,6 +264,7 @@
       "about": "About",
       "faq": "FAQ",
       "contact": "Contact",
+      "quoteStatus": "Check Quote Status",
       "kvkk": "Privacy (KVKK) Notice",
       "privacy": "Privacy Policy",
       "cookies": "Cookie Policy"
@@ -226,6 +276,12 @@
     "submitAnother": "Send another request",
     "successTitle": "Your request was received",
     "successBody": "We'll get back to you shortly with the most suitable offer.",
+    "trackingLabel": "Your quote tracking code",
+    "trackingHint": "You can check the status of your quote any time with this code.",
+    "trackingCopy": "Copy code",
+    "trackingCopied": "Copied",
+    "trackingStatusLink": "Check quote status",
+    "trackingEmailNote": "If you entered an email, we've also sent this code to your inbox.",
     "kvkkConsent": "I consent to the processing of my personal data for the purpose of a quote.",
     "kvkkLink": "read the Privacy (KVKK) Notice",
     "sensitiveConsent": "I give explicit consent to the processing of my special-category (health) personal data.",

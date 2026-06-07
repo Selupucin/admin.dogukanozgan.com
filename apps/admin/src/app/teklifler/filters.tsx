@@ -9,6 +9,7 @@ import { useCallback } from "react";
 import { getAllProducts } from "@do/products";
 import { QUOTE_STATUSES, STATUS_LABELS } from "@/lib/crm";
 import { buttonClass } from "@/components/ui";
+import { FilterSelect } from "@/components/filter-select";
 
 const controlClass =
   "rounded-xl border border-input bg-card px-3 py-2 text-sm text-foreground " +
@@ -57,36 +58,24 @@ export function Filters({
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
+      <label className="flex w-44 flex-col gap-1 text-xs font-medium text-muted-foreground">
         Ürün
-        <select
+        <FilterSelect
+          ariaLabel="Ürüne göre filtrele"
           value={current.product ?? ""}
-          className={controlClass}
-          onChange={(e) => update("product", e.target.value)}
-        >
-          <option value="">Tümü</option>
-          {products.map((p) => (
-            <option key={p.slug} value={p.slug}>
-              {p.name.tr}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => update("product", v)}
+          options={products.map((p) => ({ value: p.slug, label: p.name.tr }))}
+        />
       </label>
 
-      <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
+      <label className="flex w-44 flex-col gap-1 text-xs font-medium text-muted-foreground">
         Durum
-        <select
+        <FilterSelect
+          ariaLabel="Duruma göre filtrele"
           value={current.status ?? ""}
-          className={controlClass}
-          onChange={(e) => update("status", e.target.value)}
-        >
-          <option value="">Tümü</option>
-          {QUOTE_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {STATUS_LABELS[s]}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => update("status", v)}
+          options={QUOTE_STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] }))}
+        />
       </label>
 
       <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">

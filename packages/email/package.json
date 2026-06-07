@@ -1,0 +1,29 @@
+{
+  "name": "@do/email",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Paylaşımlı e-posta katmanı (Resend + React Email) — marka uyumlu şablonlar, env-flag'li gönderim. YALNIZCA sunucu.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.0.6",
+    "resend": "^6.12.4"
+  },
+  "devDependencies": {
+    "@do/config": "workspace:*",
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.6",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

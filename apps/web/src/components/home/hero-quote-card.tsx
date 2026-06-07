@@ -10,7 +10,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@do/ui";
 import { useRouter } from "@/i18n/navigation";
 import { getAllProducts, getLocalizedSlug } from "@do/products";
 import { routing } from "@/i18n/routing";
@@ -48,40 +49,20 @@ export function HeroQuoteCard({ locale }: { locale: Locale }) {
           >
             {t("branchLabel")}
           </label>
-          {/* Erişilebilirlik için NATIVE <select> korunur (mobil/a11y); sadece
-              wrapper + appearance:none + ÖZEL chevron ile docs/09 diline uygun
-              görünüm verilir. Light + dark temada okunaklı. */}
-          <div className="relative">
-            <select
-              id="hero-branch"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              className={
-                "h-12 w-full appearance-none rounded-xl border-[1.5px] border-input bg-background px-4 pr-11 text-base text-foreground shadow-sm transition " +
-                "hover:border-secondary/60 focus:border-secondary focus:outline-none focus:ring-4 focus:ring-secondary/15 " +
-                // Placeholder (boş seçim) soluk; bir ürün seçilince tam renk.
-                (slug ? "" : "text-muted-foreground")
-              }
-            >
-              <option value="" className="text-muted-foreground">
-                {t("branchPlaceholder")}
-              </option>
+          {/* Tema-uyumlu, erişilebilir @do/ui Select (K33) — açılır listesi de
+              özelleştirilmiş, light + dark uyumlu. value = ürünün YEREL slug'ı. */}
+          <Select value={slug || undefined} onValueChange={setSlug}>
+            <SelectTrigger id="hero-branch">
+              <SelectValue placeholder={t("branchPlaceholder")} />
+            </SelectTrigger>
+            <SelectContent>
               {products.map((p) => (
-                <option
-                  key={p.slug}
-                  value={getLocalizedSlug(p, locale)}
-                  className="bg-card text-foreground"
-                >
+                <SelectItem key={p.slug} value={getLocalizedSlug(p, locale)}>
                   {p.name[locale]}
-                </option>
+                </SelectItem>
               ))}
-            </select>
-            {/* Özel chevron — tıklamayı select'e geçirir (pointer-events-none). */}
-            <ChevronDown
-              aria-hidden
-              className="pointer-events-none absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors"
-            />
-          </div>
+            </SelectContent>
+          </Select>
         </div>
 
         <button

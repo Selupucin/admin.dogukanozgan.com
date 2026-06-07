@@ -79,7 +79,12 @@ export default async function TekliflerPage({
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
-      <h1 className="font-heading text-2xl font-semibold">Teklif Talepleri</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-semibold">Teklif Talepleri</h1>
+        <Link href="/teklifler/yeni" className={buttonClass("primary", "sm")}>
+          + Manuel Ekle
+        </Link>
+      </div>
 
       {/* Özet kartları (docs/05) */}
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

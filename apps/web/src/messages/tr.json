@@ -188,11 +188,28 @@
     "formEmailPlaceholder": "ornek@eposta.com",
     "formSubject": "Konu",
     "formSubjectPlaceholder": "Örn. Sağlık sigortası teklifi",
-    "formMessage": "Mesajınız (opsiyonel)",
+    "formMessage": "Mesajınız",
     "formMessagePlaceholder": "Kısaca ihtiyacınızı yazabilirsiniz",
-    "formWhatsappHint": "Bu form, mesajınızı WhatsApp üzerinden iletmek için hazırlanır. Gönder'e bastığınızda WhatsApp açılır.",
-    "formSubmit": "WhatsApp'tan Gönder",
-    "formNote": "Bilgileriniz yalnızca size dönüş yapmak amacıyla kullanılır."
+    "formWhatsappHint": "Hemen yazışmak isterseniz, formu WhatsApp üzerinden de iletebilirsiniz.",
+    "formSubmit": "Geri Arama Talebi Gönder",
+    "formSubmitting": "Gönderiliyor…",
+    "formWhatsappAlt": "WhatsApp'tan yaz",
+    "formNote": "Bilgileriniz yalnızca size dönüş yapmak amacıyla, KVKK'ya uygun şekilde işlenir.",
+    "kvkkConsent": "Kişisel verilerimin bana geri dönüş yapılması amacıyla işlenmesini kabul ediyorum.",
+    "kvkkLink": "KVKK Aydınlatma Metni'ni oku",
+    "successTitle": "Talebiniz alındı",
+    "successBody": "Geri arama talebiniz bize ulaştı. En kısa sürede sizinle iletişime geçeceğiz.",
+    "submitAnother": "Yeni talep gönder",
+    "errors": {
+      "rateLimited": "Çok sayıda deneme yaptınız. Lütfen bir süre sonra tekrar deneyin.",
+      "validation": "Lütfen formdaki işaretli alanları kontrol edin.",
+      "consentRequired": "Devam etmek için KVKK aydınlatma onayını işaretlemelisiniz.",
+      "server": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
+      "fullName": "Lütfen ad soyadınızı girin.",
+      "phone": "Lütfen geçerli bir telefon numarası girin.",
+      "email": "Lütfen geçerli bir e-posta girin.",
+      "message": "Lütfen kısaca mesajınızı yazın."
+    }
   },
   "faqPage": {
     "metaTitle": "Sıkça Sorulan Sorular",
@@ -203,6 +220,38 @@
     "ctaTitle": "Sorunuza yanıt bulamadınız mı?",
     "ctaBody": "Bana doğrudan ulaşın, ihtiyacınıza özel yardımcı olayım.",
     "ctaButton": "İletişime Geç"
+  },
+  "quoteStatus": {
+    "metaTitle": "Teklif Durumu Sorgula",
+    "metaDescription": "Teklif talebiniz için size verilen takip kodunu girerek teklifinizin güncel durumunu öğrenin.",
+    "navLabel": "Teklif Durumu",
+    "eyebrow": "Teklif Takibi",
+    "heading": "Teklifinizin durumunu sorgulayın",
+    "intro": "Teklif talebinizden sonra size verilen takip kodunu girin; teklifinizin güncel durumunu burada görebilirsiniz.",
+    "codeLabel": "Takip kodu",
+    "codePlaceholder": "Örn. ABCD234XYZ",
+    "submit": "Durumu Sorgula",
+    "submitting": "Sorgulanıyor…",
+    "resultTitle": "Teklif durumu",
+    "product": "Sigorta ürünü",
+    "status": "Durum",
+    "createdAt": "Talep tarihi",
+    "policyEndDate": "Poliçe bitiş tarihi",
+    "privacyNote": "Gizliliğiniz için yalnızca ürün, durum ve tarih bilgisi gösterilir. Kişisel bilgileriniz burada paylaşılmaz.",
+    "newSearch": "Başka bir kod sorgula",
+    "statuses": {
+      "YENI": "Talebiniz alındı",
+      "ARANDI": "Sizinle iletişime geçildi",
+      "TEKLIF_VERILDI": "Teklifiniz hazırlandı",
+      "POLICE_YAPILDI": "Poliçeniz düzenlendi",
+      "IPTAL": "Talep kapatıldı"
+    },
+    "errors": {
+      "rateLimited": "Çok sayıda deneme yaptınız. Lütfen bir süre sonra tekrar deneyin.",
+      "notFound": "Bu koda ait bir teklif bulunamadı. Lütfen kodu kontrol edip tekrar deneyin.",
+      "invalid": "Lütfen geçerli bir takip kodu girin.",
+      "server": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
+    }
   },
   "footer": {
     "about": "Çoklu şirket acenteliğiyle, her branşta en uygun teklifi sizin için karşılaştıran bağımsız sigorta danışmanı. Şişli / İstanbul.",
@@ -215,6 +264,7 @@
       "about": "Hakkımda",
       "faq": "Sıkça Sorulanlar",
       "contact": "İletişim",
+      "quoteStatus": "Teklif Durumu Sorgula",
       "kvkk": "KVKK Aydınlatma Metni",
       "privacy": "Gizlilik Politikası",
       "cookies": "Çerez Politikası"
@@ -226,6 +276,12 @@
     "submitAnother": "Yeni talep gönder",
     "successTitle": "Talebiniz alındı",
     "successBody": "En kısa sürede size en uygun teklifle dönüş yapacağız.",
+    "trackingLabel": "Teklif takip kodunuz",
+    "trackingHint": "Bu kodla teklifinizin durumunu istediğiniz zaman sorgulayabilirsiniz.",
+    "trackingCopy": "Kodu kopyala",
+    "trackingCopied": "Kopyalandı",
+    "trackingStatusLink": "Teklif durumunu sorgula",
+    "trackingEmailNote": "Bu kodu, e-posta adresinizi girdiyseniz e-postanıza da gönderdik.",
     "kvkkConsent": "Kişisel verilerimin teklif amacıyla işlenmesini kabul ediyorum.",
     "kvkkLink": "KVKK Aydınlatma Metni'ni oku",
     "sensitiveConsent": "Sağlık durumuma ilişkin özel nitelikli kişisel verilerimin işlenmesine açık rıza veriyorum.",

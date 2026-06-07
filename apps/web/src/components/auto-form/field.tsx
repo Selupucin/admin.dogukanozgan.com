@@ -6,7 +6,7 @@
 
 import { type UseFormReturn, Controller } from "react-hook-form";
 import { Check } from "lucide-react";
-import { cn } from "@do/ui";
+import { cn, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@do/ui";
 import type { ProductField, Locale } from "./types-bridge";
 import { CascadeField } from "./cascade-field";
 
@@ -205,15 +205,31 @@ function renderControl({
       );
 
     case "select":
+      // Tema-uyumlu, erişilebilir @do/ui Select (K33). Radix kontrollü → Controller.
       return (
-        <select id={id} aria-describedby={describedBy} {...register(field.name)} className={cls}>
-          <option value="">{locale === "tr" ? "Seçiniz" : "Select"}</option>
-          {field.options?.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label[locale]}
-            </option>
-          ))}
-        </select>
+        <Controller
+          name={field.name}
+          control={control}
+          render={({ field: rhf }) => (
+            <Select value={(rhf.value as string) || undefined} onValueChange={rhf.onChange}>
+              <SelectTrigger
+                id={id}
+                aria-describedby={describedBy}
+                onBlur={rhf.onBlur}
+                className="bg-card"
+              >
+                <SelectValue placeholder={locale === "tr" ? "Seçiniz" : "Select"} />
+              </SelectTrigger>
+              <SelectContent>
+                {field.options?.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label[locale]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
       );
 
     case "radio":

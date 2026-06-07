@@ -24,6 +24,9 @@ export const routing = defineRouting({
     },
     "/hakkimda": { tr: "/hakkimda", en: "/about" },
     "/iletisim": { tr: "/iletisim", en: "/contact" },
+    // Teklif durum sorgulama (K30 / docs/12 §3, docs/02). Kod ile yalnız
+    // ürün+durum+tarih gösterilir; hassas veri yok.
+    "/teklif-durumu": { tr: "/teklif-durumu", en: "/quote-status" },
     "/sss": { tr: "/sss", en: "/faq" },
     "/kvkk": { tr: "/kvkk", en: "/privacy-notice" },
     "/gizlilik": { tr: "/gizlilik", en: "/privacy" },

@@ -12,12 +12,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { cn } from "@do/ui";
 import type { ProductDefinition, Locale } from "./types-bridge";
 import { buildFormSchema, isFieldVisible } from "./schema";
 import { Field } from "./field";
 import { ConsentField } from "./consent-field";
+import { QuoteSuccess } from "./quote-success";
 import { KvkkBody, SensitiveConsentBody } from "@/components/legal/kvkk-content";
 import { submitQuoteRequest, type SubmitQuoteResult } from "@/lib/submit-quote";
 
@@ -44,6 +45,8 @@ export function AutoForm({ product, locale, defaultValues }: AutoFormProps) {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  // K30: başarı ekranında gösterilen durum-takip kodu (sunucudan döner).
+  const [trackingCode, setTrackingCode] = useState<string | null>(null);
   const [serverError, setServerError] = useState<SubmitQuoteResult["error"] | null>(null);
 
   // docs/03 koşullu görünürlük: tüm değerleri izle → showIf'e göre alanları göster/gizle
@@ -81,6 +84,7 @@ export function AutoForm({ product, locale, defaultValues }: AutoFormProps) {
     const result = await submitQuoteRequest(fd);
 
     if (result.ok) {
+      setTrackingCode(result.trackingCode ?? null);
       setSubmitted(true);
       return;
     }
@@ -96,21 +100,14 @@ export function AutoForm({ product, locale, defaultValues }: AutoFormProps) {
 
   if (submitted) {
     return (
-      <div className="rounded-[var(--radius)] border border-secondary/30 bg-accent p-8 text-center">
-        <CheckCircle2 className="mx-auto h-12 w-12 text-secondary" aria-hidden />
-        <h3 className="mt-4 font-heading text-2xl text-foreground">{t("successTitle")}</h3>
-        <p className="mt-2 text-sm text-accent-foreground/80">{t("successBody")}</p>
-        <button
-          type="button"
-          onClick={() => {
-            form.reset();
-            setSubmitted(false);
-          }}
-          className="mt-6 rounded-pill border border-input px-5 py-2 text-sm font-medium transition hover:bg-card"
-        >
-          {t("submitAnother")}
-        </button>
-      </div>
+      <QuoteSuccess
+        trackingCode={trackingCode}
+        onReset={() => {
+          form.reset();
+          setSubmitted(false);
+          setTrackingCode(null);
+        }}
+      />
     );
   }
 

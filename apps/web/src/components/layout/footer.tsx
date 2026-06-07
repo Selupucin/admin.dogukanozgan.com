@@ -22,6 +22,7 @@ export async function Footer({ locale }: { locale: Locale }) {
     { key: "about", href: "/hakkimda" },
     { key: "faq", href: "/sss" },
     { key: "contact", href: "/iletisim" },
+    { key: "quoteStatus", href: "/teklif-durumu" },
     { key: "kvkk", href: "/kvkk" },
     { key: "privacy", href: "/gizlilik" },
     { key: "cookies", href: "/cerez-politikasi" },

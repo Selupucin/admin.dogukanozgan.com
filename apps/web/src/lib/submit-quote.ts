@@ -17,7 +17,15 @@
 // ⚠️ Gizli anahtarlar (service role) yalnızca burada/@do/db'de, asla istemcide.
 
 import { headers } from "next/headers";
-import { prisma, uploadToStorage, isStorageConfigured, Prisma } from "@do/db";
+import {
+  prisma,
+  uploadToStorage,
+  isStorageConfigured,
+  Prisma,
+  generateUniqueTrackingCode,
+  createNotification,
+} from "@do/db";
+import { sendQuoteReceived, isEmailConfigured } from "@do/email";
 import { getProduct } from "@do/products";
 import { getProvinces, getDistricts } from "@do/products/locations";
 import type { ProductDefinition, ProductField } from "@do/products";
@@ -40,6 +48,8 @@ export interface SubmitQuoteResult {
   /** validation hatalarında alan bazlı mesajlar (opsiyonel). */
   fieldErrors?: Record<string, string>;
   quoteId?: string;
+  /** Durum-takip kodu (K30) — başarı ekranında müşteriye gösterilir. */
+  trackingCode?: string;
 }
 
 // Rate limit politikası: 15 dakikalık pencerede IP başına 8 gönderim.
@@ -110,10 +120,16 @@ export async function submitQuoteRequest(formData: FormData): Promise<SubmitQuot
     // 5) Ortak alanları payload'dan AYIR (docs/04: ortak=sütun, gerisi=JSON).
     const { common, payload } = splitCommonFields(product, data);
 
+    // Durum-takip kodu (K30): kısa, tahmin-edilemez, benzersiz. Müşteri durum
+    // sorgu sayfasında bu kodu kullanır.
+    const trackingCode = await generateUniqueTrackingCode();
+
     const quote = await prisma.quoteRequest.create({
       data: {
         product: product.slug,
         locale,
+        trackingCode,
+        // source varsayılan WEB (şema). Açıkça belirtmeye gerek yok.
         fullName: common.fullName,
         phone: common.phone,
         email: common.email ?? null,
@@ -158,7 +174,35 @@ export async function submitQuoteRequest(formData: FormData): Promise<SubmitQuot
       }
     }
 
-    return { ok: true, quoteId: quote.id };
+    // 7) Admin bildirimi (K29) — yan etki; HATA TEKLİFİ DÜŞÜRMESİN (yut + logla).
+    try {
+      await createNotification({
+        type: "TEKLIF",
+        title: `Yeni teklif talebi: ${productName(product, locale)}`,
+        body: `${common.fullName} — ${common.phone}`,
+        relatedId: quote.id,
+      });
+    } catch (err) {
+      console.error("[submit-quote] notification create failed:", err);
+    }
+
+    // 8) Müşteriye "Teklif Alındı" e-postası + takip kodu (K30) — flag'li; e-posta
+    //    yoksa veya gönderim hatasıysa AKIŞ KIRILMAZ (yut + logla).
+    if (common.email && isEmailConfigured()) {
+      try {
+        await sendQuoteReceived({
+          to: common.email,
+          productName: productName(product, locale),
+          code: trackingCode,
+          statusUrl: buildStatusUrl(trackingCode, locale),
+          locale,
+        });
+      } catch (err) {
+        console.error("[submit-quote] sendQuoteReceived failed:", err);
+      }
+    }
+
+    return { ok: true, quoteId: quote.id, trackingCode };
   } catch (err) {
     console.error("[submit-quote] unexpected error:", err);
     return { ok: false, error: "server" };
@@ -278,6 +322,23 @@ function splitCommonFields(
   }
 
   return { common: { fullName, phone, email }, payload };
+}
+
+/** Ürünün locale'e göre görünen adı (e-posta/bildirim için). */
+function productName(product: ProductDefinition, locale: Locale): string {
+  return product.name[locale] ?? product.name.tr;
+}
+
+/**
+ * Müşterinin durum sorgu sayfasının tam URL'i (K30). Kod query parametresi olarak
+ * eklenir; sayfa otomatik doldurabilir. EN'de yol "/quote-status" (docs/12 §3).
+ * TODO(doc): Durum sayfası rotası web-builder tarafından eklenecek (routing.ts);
+ * yol değişirse buradaki segment güncellenir.
+ */
+function buildStatusUrl(code: string, locale: Locale): string {
+  const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://dogukanozgan.com").replace(/\/+$/, "");
+  const segment = locale === "en" ? "quote-status" : "teklif-durumu";
+  return `${base}/${locale}/${segment}?code=${encodeURIComponent(code)}`;
 }
 
 function isSensitiveProduct(product: ProductDefinition): boolean {

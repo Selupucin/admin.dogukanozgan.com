@@ -30,3 +30,15 @@ export * from "./kvkk";
 
 // Admin kimlik doğrulama yardımcıları (şifre hash + Credentials doğrulama).
 export * from "./auth";
+
+// Teklif durum-takip kodu (K30) — üretim + KVKK-güvenli durum sorgusu.
+export * from "./tracking";
+
+// Admin içi bildirimler (K29) — oluştur/listele/okundu.
+export * from "./notifications";
+
+// İletişim talepleri (K31) — oluştur + ILETISIM bildirimi.
+export * from "./contact";
+
+// Teklif/poliçe yaşam döngüsü (K30/K32) — manuel oluştur, poliçe tarih/belge, bitiş sorgusu.
+export * from "./quotes";

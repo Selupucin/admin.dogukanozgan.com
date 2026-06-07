@@ -57,7 +57,7 @@ const legacyRedirects = [
 const nextConfig = {
   reactStrictMode: true,
   // Monorepo paketleri (workspace) Next derlemesine dahil edilir.
-  transpilePackages: ["@do/ui", "@do/products", "@do/db"],
+  transpilePackages: ["@do/ui", "@do/products", "@do/db", "@do/email"],
   // pnpm monorepo'da Prisma query engine'i serverless fonksiyona kopyalanabilsin diye
   // dosya-izleme kökü monorepo köküne; @prisma/client harici (node_modules'tan yüklenir).
   outputFileTracingRoot: path.join(__dirname, "../../"),

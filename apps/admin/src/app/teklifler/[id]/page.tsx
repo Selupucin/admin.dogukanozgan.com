@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { isStorageConfigured } from "@do/db";
+import { isEmailConfigured } from "@do/email";
 import { getQuote } from "@/lib/quotes";
 import { describePayload } from "@/lib/payload";
 import { STATUS_LABELS, STATUS_BADGE_CLASS, productLabel, productBadgeClass } from "@/lib/crm";
-import { formatDateTime, telHref, whatsappHref, mailtoHref } from "@/lib/contact";
+import { formatDate, formatDateTime, telHref, whatsappHref, mailtoHref } from "@/lib/contact";
 import { Badge, Card, CardContent, CardHeader, CardTitle, buttonClass } from "@/components/ui";
 import { StatusControl } from "./status-control";
 import { NoteForm } from "./note-form";
 import { KvkkActions } from "./kvkk-actions";
+import { PolicyDelivery } from "./policy-delivery";
+import { PolicyDates } from "./policy-dates";
 
 export const metadata: Metadata = {
   title: "Teklif Detayı — Yönetim",
@@ -59,6 +63,9 @@ export default async function TeklifDetayPage({ params }: { params: Promise<{ id
 
   const fields = describePayload(quote.product, quote.payload);
   const { items: assets, configured: storageConfigured } = buildAssetViews(quote.assets);
+  const blobConfigured = isStorageConfigured();
+  const emailConfigured = isEmailConfigured();
+  const isPolicy = quote.status === "POLICE_YAPILDI";
 
   const waMessage = `Merhaba ${quote.fullName}, ${productLabel(quote.product)} talebiniz hakkında arıyorum.`;
 
@@ -77,9 +84,17 @@ export default async function TeklifDetayPage({ params }: { params: Promise<{ id
             <Badge className={STATUS_BADGE_CLASS[quote.status]}>
               {STATUS_LABELS[quote.status]}
             </Badge>
+            {quote.source === "MANUAL" && (
+              <Badge className="bg-muted text-muted-foreground border-border">Manuel kayıt</Badge>
+            )}
             <span className="text-xs text-muted-foreground">
               {formatDateTime(quote.createdAt)} alındı
             </span>
+            {quote.trackingCode && (
+              <span className="text-xs text-muted-foreground">
+                · Takip kodu: <span className="font-mono">{quote.trackingCode}</span>
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -243,6 +258,48 @@ export default async function TeklifDetayPage({ params }: { params: Promise<{ id
               </p>
             </CardContent>
           </Card>
+
+          {/* Poliçe tarihleri + teslim — yalnız POLICE_YAPILDI durumunda (K32) */}
+          {isPolicy && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Poliçe Tarihleri</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-3">
+                  <dl className="flex flex-col gap-2 text-sm">
+                    <Row
+                      label="Başlangıç"
+                      value={quote.policyStartDate ? formatDate(quote.policyStartDate) : "—"}
+                    />
+                    <Row
+                      label="Bitiş"
+                      value={quote.policyEndDate ? formatDate(quote.policyEndDate) : "—"}
+                    />
+                  </dl>
+                  <PolicyDates
+                    quoteId={quote.id}
+                    start={quote.policyStartDate}
+                    end={quote.policyEndDate}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Poliçe Yükle &amp; Gönder</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PolicyDelivery
+                    quoteId={quote.id}
+                    hasEmail={Boolean(quote.email)}
+                    emailConfigured={emailConfigured}
+                    storageConfigured={blobConfigured}
+                  />
+                </CardContent>
+              </Card>
+            </>
+          )}
 
           {/* KVKK rıza kanıtı (salt-okunur) — docs/05, docs/06 §2 */}
           <Card>

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@do/db": "workspace:*",
+    "@do/email": "workspace:*",
     "@do/products": "workspace:*",
     "@do/ui": "workspace:*",
     "bcryptjs": "^3.0.2",

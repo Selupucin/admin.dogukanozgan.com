@@ -20,6 +20,18 @@
 // Aşama 3 NOTU (admin auth): User modeline `passwordHash` (bcrypt) alanı eklendi —
 // docs/05 "Şifreler hash'lenir". Auth.js Credentials + JWT oturumu kullanılır;
 // adapter (Account/Session tabloları) GEREKMEZ.
+//
+// Aşama 7 NOTU (docs/12 — İletişim/Bildirim/Poliçe/Mail): QuoteRequest'e poliçe
+// yaşam döngüsü alanları (trackingCode/source/policy*), iki yeni model
+// (ContactRequest, Notification) ve üç yeni enum (QuoteSource, ContactStatus,
+// NotificationType) eklendi. Model/alan isimleri docs/12 §1 + docs/04 ile birebir.
+//
+// ⚠️ db push UYARISI: Bu şema CANLI MongoDB Atlas'a HENÜZ uygulanMADI. Şema
+// değişikliklerini kullanıcı (Atlas erişimi olan) uygulayacak:
+//     pnpm --filter @do/db db:push
+// Agent bu komutu ÇALIŞTIRMAZ (canlı DB bağlantısı yok). Yalnızca `prisma generate`
+// ile client güncellenir. Yeni `trackingCode @unique` ve poliçe alanları db push
+// sonrası sorgulanabilir olur.
 
 generator client {
   provider = "prisma-client-js"
@@ -38,6 +50,13 @@ model QuoteRequest {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   product String // ürün slug: "trafik" | "saglik" | "bireysel-emeklilik" | "konut" ...
   locale  String @default("tr") // formun doldurulduğu dil
+
+  // Durum-takip kodu (K30/docs/12): kısa (≈10), tahmin-edilemez (base32). Müşteri
+  // web'de bu kodu girip teklif durumunu sorgular. @unique → benzersizlik garantisi.
+  trackingCode String @unique
+
+  // Talebin kaynağı (K32/docs/12): WEB = site formu, MANUAL = admin elle girişi.
+  source QuoteSource @default(WEB)
 
   // Ortak iletişim alanları (sorgulanabilir olsun diye gerçek alan)
   fullName String
@@ -59,12 +78,26 @@ model QuoteRequest {
   notes  Note[]
   assets Asset[] // yüklenen fotoğraf/dosyalar (örn. trafikte ruhsat)
 
+  // Poliçe yaşam döngüsü (K32/docs/12). status=POLICE_YAPILDI olunca doldurulur.
+  policyStartDate DateTime?
+  policyEndDate   DateTime?
+  // Yüklenen poliçe belgesi referansı. Belge bir Asset (kind="police") olarak
+  // saklanır; bu alan o Asset'in id'sini tutar (hızlı erişim için). docs/12 §1.
+  policyAssetId   String?   @db.ObjectId
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([product])
   @@index([status])
   @@index([createdAt])
+  @@index([policyEndDate])
+}
+
+// Teklif/poliçe kaydının kaynağı (K32). MANUAL = web dışı (admin elle ekledi).
+enum QuoteSource {
+  WEB
+  MANUAL
 }
 
 // CRM durum akışı
@@ -118,4 +151,61 @@ model Asset {
   createdAt DateTime      @default(now())
 
   @@index([quoteId])
+}
+
+// Ziyaretçi iletişim talepleri (K31/docs/12). Web iletişim formu artık (WhatsApp
+// yerine veya yanında) buraya kaydeder; admin'de "İletişim Talepleri" sayfasına düşer.
+model ContactRequest {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  fullName String
+  phone    String
+  email    String?
+  subject  String?
+  message  String
+
+  status ContactStatus @default(YENI)
+
+  // KVKK rıza kanıtı (docs/06): iletişim formunda da aydınlatma + rıza zorunlu.
+  consentKvkk      Boolean   @default(false)
+  consentAt        DateTime?
+  consentIp        String?
+  consentUserAgent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+// İletişim talebi CRM durum akışı (K31).
+enum ContactStatus {
+  YENI // Yeni geldi
+  OKUNDU // Görüldü
+  YANITLANDI // Yanıt verildi
+  KAPANDI // Kapatıldı
+}
+
+// Admin içi bildirimler (K29/docs/12). Admin header'daki çan okunmamışları gösterir.
+// Kaynaklar: yeni teklif (TEKLIF), yeni iletişim talebi (ILETISIM), yaklaşan/biten
+// poliçe (POLICE_BITIS). Doğukan'a otomatik MAIL gönderilmez; yalnız panel içi.
+model Notification {
+  id    String           @id @default(auto()) @map("_id") @db.ObjectId
+  type  NotificationType
+  title String
+  body  String?
+  // İlgili kaydın id'si (örn. QuoteRequest.id / ContactRequest.id). Tıklayınca
+  // admin ilgili kayda gider. Tip bazlı; bu yüzden FK ilişkisi kurulmaz (esnek).
+  relatedId String? @db.ObjectId
+  read      Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read])
+  @@index([createdAt])
+}
+
+// Bildirim türü (K29).
+enum NotificationType {
+  TEKLIF // Yeni teklif talebi
+  ILETISIM // Yeni iletişim talebi
+  POLICE_BITIS // Yaklaşan/biten poliçe
 }

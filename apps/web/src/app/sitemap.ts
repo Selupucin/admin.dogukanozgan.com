@@ -15,6 +15,7 @@ const staticPaths: AppPathname[] = [
   "/planlar",
   "/hakkimda",
   "/iletisim",
+  "/teklif-durumu",
   "/sss",
   "/kvkk",
   "/gizlilik",

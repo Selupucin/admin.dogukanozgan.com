@@ -8,9 +8,19 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { prisma, deleteQuoteRequest, anonymizeQuoteRequest, type QuoteStatus } from "@do/db";
+import {
+  prisma,
+  deleteQuoteRequest,
+  anonymizeQuoteRequest,
+  setPolicyDates,
+  attachPolicyDocument,
+  uploadToStorage,
+  isStorageConfigured,
+  type QuoteStatus,
+} from "@do/db";
+import { isEmailConfigured, sendPolicyDelivery } from "@do/email";
 import { auth } from "@/auth";
-import { canTransition, QUOTE_STATUSES } from "@/lib/crm";
+import { canTransition, QUOTE_STATUSES, productLabel } from "@/lib/crm";
 
 async function requireAuth() {
   const session = await auth();
@@ -25,8 +35,23 @@ export interface ActionResult {
   error?: string;
 }
 
-/** CRM durumunu değiştirir (docs/05 akışına göre geçiş doğrulanır). */
-export async function updateStatusAction(quoteId: string, next: string): Promise<ActionResult> {
+/** Geçerli bir tarih (YYYY-MM-DD) parse eder; boş/hatalıysa null. */
+function parseDate(value?: string | null): Date | null {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/**
+ * CRM durumunu değiştirir (docs/05 akışına göre geçiş doğrulanır).
+ * POLICE_YAPILDI'ya geçişte poliçe başlangıç + bitiş tarihi ZORUNLUDUR (K32 / docs/12):
+ * tarihsiz POLICE_YAPILDI'ya izin verilmez.
+ */
+export async function updateStatusAction(
+  quoteId: string,
+  next: string,
+  policy?: { start?: string | null; end?: string | null },
+): Promise<ActionResult> {
   await requireAuth();
 
   if (!QUOTE_STATUSES.includes(next as QuoteStatus)) {
@@ -44,13 +69,57 @@ export async function updateStatusAction(quoteId: string, next: string): Promise
     return { ok: false, error: "Bu duruma geçiş yapılamaz." };
   }
 
+  // POLICE_YAPILDI → başlangıç + bitiş tarihi zorunlu (K32).
+  let start: Date | null = null;
+  let end: Date | null = null;
+  if (target === "POLICE_YAPILDI") {
+    start = parseDate(policy?.start);
+    end = parseDate(policy?.end);
+    if (!start || !end) {
+      return { ok: false, error: "Poliçe başlangıç ve bitiş tarihi zorunludur." };
+    }
+    if (end <= start) {
+      return { ok: false, error: "Bitiş tarihi başlangıçtan sonra olmalıdır." };
+    }
+  }
+
   await prisma.quoteRequest.update({
     where: { id: quoteId },
     data: { status: target }, // updatedAt @updatedAt ile otomatik (docs/05).
   });
 
+  // Tarihler durum güncellemesinden sonra ayarlanır (POLICE_YAPILDI akışı, docs/12).
+  if (target === "POLICE_YAPILDI") {
+    await setPolicyDates(quoteId, { start, end });
+  }
+
   revalidatePath(`/teklifler/${quoteId}`);
   revalidatePath("/teklifler");
+  revalidatePath("/policeler");
+  return { ok: true };
+}
+
+/**
+ * Mevcut POLICE_YAPILDI teklifine sonradan poliçe tarihi girer/günceller (K32 / docs/12).
+ * Tarihsiz kaydı düzeltmek için. Durum kontrolü: yalnız POLICE_YAPILDI'da anlamlı.
+ */
+export async function setPolicyDatesAction(
+  quoteId: string,
+  startStr: string,
+  endStr: string,
+): Promise<ActionResult> {
+  await requireAuth();
+
+  const start = parseDate(startStr);
+  const end = parseDate(endStr);
+  if (!start || !end) return { ok: false, error: "Geçerli başlangıç ve bitiş tarihi girin." };
+  if (end <= start) return { ok: false, error: "Bitiş tarihi başlangıçtan sonra olmalıdır." };
+
+  const updated = await setPolicyDates(quoteId, { start, end });
+  if (!updated) return { ok: false, error: "Teklif bulunamadı." };
+
+  revalidatePath(`/teklifler/${quoteId}`);
+  revalidatePath("/policeler");
   return { ok: true };
 }
 
@@ -90,4 +159,104 @@ export async function anonymizeQuoteAction(quoteId: string): Promise<ActionResul
   revalidatePath(`/teklifler/${quoteId}`);
   revalidatePath("/teklifler");
   return { ok: true };
+}
+
+export interface PolicyDeliveryResult extends ActionResult {
+  /** Müşteriye e-posta gönderildi mi? (e-posta yoksa / yapılandırma yoksa false) */
+  emailSent?: boolean;
+  /** Bilgilendirme notu (örn. "e-posta yapılandırılmadı"). */
+  notice?: string;
+}
+
+const MAX_POLICY_BYTES = 15 * 1024 * 1024; // 15 MB
+
+/** Blob içindeki poliçe belgesi yolu (kind="police"). */
+function buildPolicyPath(quoteId: string, originalName: string): string {
+  const safe = originalName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60);
+  const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return `police/${quoteId}/${unique}-${safe}`;
+}
+
+/**
+ * Poliçe belgesini yükler → teklife bağlar → müşteri e-postası varsa "Poliçe Teslim"
+ * maili gönderir (K28+K32, docs/12 madde 9).
+ * - Storage yoksa hata döner (feature flag).
+ * - E-posta yapılandırılmamışsa yükleme yapılır ama mail atlanır (bilgilendirme döner).
+ */
+export async function uploadAndSendPolicyAction(
+  quoteId: string,
+  formData: FormData,
+): Promise<PolicyDeliveryResult> {
+  await requireAuth();
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: "Belge seçilmedi." };
+  }
+  if (file.size > MAX_POLICY_BYTES) {
+    return { ok: false, error: "Belge çok büyük (en fazla 15 MB)." };
+  }
+
+  if (!isStorageConfigured()) {
+    return { ok: false, error: "Depolama yapılandırılmadı (BLOB_READ_WRITE_TOKEN eksik)." };
+  }
+
+  const quote = await prisma.quoteRequest.findUnique({
+    where: { id: quoteId },
+    select: { id: true, email: true, product: true, locale: true },
+  });
+  if (!quote) return { ok: false, error: "Teklif bulunamadı." };
+
+  // 1) Blob'a yükle.
+  let uploaded: { url: string; path: string };
+  try {
+    uploaded = await uploadToStorage({
+      path: buildPolicyPath(quoteId, file.name),
+      body: await file.arrayBuffer(),
+      contentType: file.type || undefined,
+    });
+  } catch (err) {
+    console.error("[teklif-detay] poliçe yükleme hatası:", err);
+    return { ok: false, error: "Belge yüklenemedi." };
+  }
+
+  // 2) Teklife bağla (Asset kind="police" + policyAssetId).
+  const attached = await attachPolicyDocument(quoteId, {
+    url: uploaded.url,
+    path: uploaded.path,
+    mimeType: file.type || null,
+    sizeBytes: file.size,
+  });
+  if (!attached) return { ok: false, error: "Belge teklife bağlanamadı." };
+
+  revalidatePath(`/teklifler/${quoteId}`);
+
+  // 3) Müşteriye "Poliçe Teslim" maili (varsa). E-posta yoksa/yapılandırma yoksa atla.
+  if (!quote.email) {
+    return { ok: true, emailSent: false, notice: "Müşteri e-postası yok — mail gönderilmedi." };
+  }
+  if (!isEmailConfigured()) {
+    return {
+      ok: true,
+      emailSent: false,
+      notice: "E-posta yapılandırılmadı — belge yüklendi, mail gönderilmedi.",
+    };
+  }
+
+  const sent = await sendPolicyDelivery({
+    to: quote.email,
+    productName: productLabel(quote.product),
+    policyUrl: uploaded.url,
+    locale: quote.locale,
+  });
+
+  if (!sent.ok) {
+    return {
+      ok: true,
+      emailSent: false,
+      notice: "Belge yüklendi ancak e-posta gönderilemedi.",
+    };
+  }
+
+  return { ok: true, emailSent: true, notice: "Belge yüklendi ve müşteriye e-posta gönderildi." };
 }
