@@ -68,6 +68,9 @@ const GENERIC_ERROR = "E-posta veya şifre hatalı.";
 const RATE_LIMITED_ERROR = "Çok fazla deneme yapıldı. Lütfen bir süre sonra tekrar deneyin.";
 const OTP_GENERIC_ERROR = "Kod hatalı veya süresi dolmuş. Lütfen tekrar deneyin.";
 const SESSION_EXPIRED_ERROR = "Oturum süresi doldu. Lütfen baştan giriş yapın.";
+// OTP üretilemedi/gönderilemedi (DB hatası veya e-posta yapılandırması yok/başarısız).
+// Enumerasyon yok — kullanıcıya genel "tekrar dene" mesajı.
+const OTP_SEND_FAILED_ERROR = "Doğrulama kodu gönderilemedi, lütfen daha sonra tekrar deneyin.";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -102,6 +105,23 @@ async function establishSession(
 ): Promise<void> {
   const ticket = signLoginTicket({ email, remember, duration });
   await signIn("credentials", { ticket, redirectTo: "/teklifler" });
+}
+
+/**
+ * OTP üretir (DB) ve e-postayla gönderir. Sadece kod gerçekten gönderildiyse `true` döner.
+ * - `issueLoginCode` exception fırlatırsa (DB hatası) → yakalanır, `false`.
+ * - `sendLoginCode` `ok:false` döndürürse (yapılandırma yok/`skipped` veya gönderim hatası)
+ *   → `false`. Böylece çağıran "kod gönderildi" demeden net hata gösterebilir.
+ * Düz kod hiçbir koşulda loglanmaz; başarısızlık nedeni kullanıcıya sızdırılmaz.
+ */
+async function issueAndSendCode(email: string): Promise<boolean> {
+  try {
+    const { code, expiresMinutes } = await issueLoginCode(email);
+    const sent = await sendLoginCode({ to: email, code, expiresMinutes, locale: "tr" });
+    return sent.ok === true;
+  } catch {
+    return false;
+  }
 }
 
 // ───────────────────────────── Adım 1 — startLogin ─────────────────────────────
@@ -151,8 +171,11 @@ export async function startLogin(_prev: LoginState, formData: FormData): Promise
   }
 
   // 4) OTP üret + hash'le + DB'ye yaz + e-postayla gönder. Düz kod saklanmaz/loglanmaz.
-  const { code, expiresMinutes } = await issueLoginCode(email);
-  await sendLoginCode({ to: email, code, expiresMinutes, locale: "tr" });
+  //    Üretim (DB) veya gönderim başarısızsa Adım 2'ye GEÇME — Adım 1'de genel hata göster
+  //    (e-posta yapılandırması yok → { ok:false, skipped:true } da başarısız sayılır).
+  if (!(await issueAndSendCode(email))) {
+    return { step: "credentials", error: OTP_SEND_FAILED_ERROR };
+  }
 
   // 5) Bekleyen-giriş bağlamını HMAC imzalı kısa ömürlü çereze yaz (Adım 2 okur).
   const pending = signPendingLogin({ email, remember, duration }, PENDING_TTL_MS);
@@ -252,10 +275,12 @@ export async function resendCode(_prev: LoginState, _formData: FormData): Promis
     };
   }
 
-  // Yeni kod üret + gönder; bekleyen-giriş çerezini de tazele (süreyi uzat).
-  const { code, expiresMinutes } = await issueLoginCode(email);
-  await sendLoginCode({ to: email, code, expiresMinutes, locale: "tr" });
+  // Yeni kod üret + gönder; başarısızsa Adım 2'de kal, genel hata göster (çerezi tazeleme).
+  if (!(await issueAndSendCode(email))) {
+    return { step: "otp", error: OTP_SEND_FAILED_ERROR, maskedEmail: maskEmail(email) };
+  }
 
+  // Bekleyen-giriş çerezini de tazele (süreyi uzat).
   const refreshed = signPendingLogin({ email, remember, duration }, PENDING_TTL_MS);
   cookieStore.set(PENDING_COOKIE, refreshed, cookieOptions(Math.floor(PENDING_TTL_MS / 1000)));
 

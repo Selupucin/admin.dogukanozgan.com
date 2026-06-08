@@ -10,7 +10,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "./index";
 
-/** bcrypt cost faktörü (10 = makul güvenlik/performans dengesi). */
+/** bcrypt cost faktörü (12 = makul güvenlik/performans dengesi). */
 const BCRYPT_ROUNDS = 12;
 
 /** Düz şifreyi bcrypt ile hash'ler (seed/şifre değiştirme için). */
