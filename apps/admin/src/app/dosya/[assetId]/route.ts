@@ -1,15 +1,16 @@
 // /dosya/[assetId] — Admin dosya görüntüleme proxy'si (auth-gated).
 // Kaynak: docs/13 §Y1, docs/06 §5b/§6, docs/04 (Asset).
 //
-// NEDEN: Vercel Blob yalnız `access:"public"` desteklediğinden ham blob URL (Asset.url)
-// imzasız/süresizdir. Bu URL admin HTML'ine GÖMÜLMEZ; admin teklif detay sayfası yüklenen
-// foto/poliçeyi bu proxy üzerinden gösterir. İçerik SUNUCUDA çekilip stream edilir.
+// NEDEN: Blob'lar `access:"private"` (@vercel/blob ^2.4.0) — imzasız URL ile açılmaz,
+// içerik yalnız BLOB_READ_WRITE_TOKEN ile sunucudan okunur (fetchBlobContent → SDK `get`).
+// Ham blob URL admin HTML'ine GÖMÜLMEZ; admin teklif detay sayfası yüklenen foto/poliçeyi
+// bu proxy üzerinden gösterir. İçerik SUNUCUDA private kaynaktan çekilip stream edilir.
 //
 // GÜVENLİK:
 //  - middleware tüm admin rotalarını korur; ek olarak burada `auth()` ZORUNLU (oturum
 //    yoksa 401). Defense-in-depth.
 //  - `assetId` ObjectId guard (merkezi isValidObjectId — docs/13 §O1).
-//  - Ham blob URL yanıta/redirect'e sızdırılmaz (proxy/stream, inline gösterim).
+//  - Blob private; ham URL yanıta/redirect'e sızdırılmaz (proxy/stream, inline gösterim).
 
 import { NextResponse } from "next/server";
 import { prisma, fetchBlobContent, isValidObjectId, logError } from "@do/db";

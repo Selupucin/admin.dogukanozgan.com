@@ -141,8 +141,8 @@ enum Role {
 // Birincil kullanım: TRAFİK sigortasında müşteriden istenen ruhsat/araç fotoğrafları.
 model Asset {
   id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  path      String // Vercel Blob pathname (silme için kullanılır)
-  url       String // Blob URL (tahmin-edilemez token; doğrudan erişilir — docs/06 KVKK notu)
+  path      String // Vercel Blob pathname (silme/okuma için kullanılır)
+  url       String // Private Blob URL (access:"private"); token ile yalnız sunucudan okunur — docs/06 KVKK notu
   kind      String        @default("ruhsat") // "ruhsat" | "arac" | "belge" ...
   mimeType  String?
   sizeBytes Int?

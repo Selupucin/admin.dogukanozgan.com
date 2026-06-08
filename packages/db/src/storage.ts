@@ -1,27 +1,27 @@
-// @do/db — Vercel Blob depolama yardımcıları (yükleme + silme). — K25
+// @do/db — Vercel Blob depolama yardımcıları (yükleme + okuma + silme). — K25
 // Kaynak: docs/04 "Dosya Depolama Notu (Vercel Blob)", docs/06 §5b + §6
 // (token sadece sunucuda).
 //
-// TASARIM (docs/13 §Y1 güncel):
+// TASARIM (docs/13 §Y1 güncel — GERÇEK PRIVATE DEPOLAMA):
 // - Ruhsat/araç fotoğrafları + poliçe belgesi KİŞİSEL/ÖZEL NİTELİKLİ VERİDİR. Vercel Blob
-//   yalnız `access:"public"` modunu destekler (private read GA değil) → blob PRIVATE
-//   YAPILAMAZ. URL tahmin-edilemez token içerse de imzasız/süresizdir.
-// - BU NEDENLE: ham blob URL'i (Asset.url) İSTEMCİYE HİÇ İFŞA EDİLMEZ. Erişim sunucu-tarafı
-//   KONTROLLÜ ROTALARLA verilir:
-//     • Müşteri (poliçe): kısa ömürlü İMZALI/SÜRELİ link → /police-indir?token=... (web)
-//       (token: file-access.ts → signFileToken/verifyFileToken).
-//     • Admin (her dosya): AUTH-GATED proxy → /dosya/<assetId> (admin).
-//   Her iki rota da blob içeriğini SUNUCUDA `fetchBlobContent` ile çekip STREAM eder;
-//   ham blob URL'i yanıta/HTML'e/redirect'e ASLA sızmaz (docs/06 §5b güncel).
-// - Yükleme web app'ten (server action), görüntüleme kontrollü rotalardan; ikisi de aynı
-//   Blob store'a `BLOB_READ_WRITE_TOKEN` ile bağlanır.
-// - `@vercel/blob` paketi kullanılır (`put` / `del`). Env yoksa zarifçe devre dışı
+//   (@vercel/blob ^2.4.0) artık `access:"private"` modunu destekler: blob URL'i imzasız
+//   GET ile AÇILMAZ; içeriğe yalnız `BLOB_READ_WRITE_TOKEN` ile (SDK `get(..., {access:
+//   "private", token})`) SUNUCUDAN erişilir.
+// - BU NEDENLE: blob private'tır; ham URL ifşa olsa bile token olmadan okunamaz. Yine de
+//   Asset.url SUNUCUDA tutulur ve erişim AUTH-GATED proxy ile verilir:
+//     • Admin (her dosya): AUTH-GATED proxy → /dosya/<assetId> (admin) → `fetchBlobContent`
+//       private blob'u token ile çeker ve STREAM eder.
+//     • Müşteri (poliçe/teklif belgesi): belge artık MÜŞTERİYE E-POSTA EKİ olarak gönderilir
+//       (apps/admin deliverToCustomerAction); ayrı imzalı indirme linki/rota YOKTUR.
+// - Yükleme web/admin app'ten (server action), görüntüleme auth-gated admin proxy'sinden;
+//   hepsi aynı Blob store'a `BLOB_READ_WRITE_TOKEN` ile bağlanır.
+// - `@vercel/blob` paketi kullanılır (`put` / `get` / `del`). Env yoksa zarifçe devre dışı
 //   kalır (feature flag).
 //
 // ⚠️ GÜVENLİK: BLOB_READ_WRITE_TOKEN + Asset.url YALNIZCA sunucuda kullanılır. Bu modül
 // hiçbir zaman istemci bileşenine import EDİLMEMELİDİR ("server-only" sınırı).
 
-import { put, del } from "@vercel/blob";
+import { put, del, get } from "@vercel/blob";
 
 /**
  * Blob içindeki yol öneki (ruhsat/araç fotoğrafları). Blob'da "bucket" yoktur;
@@ -53,9 +53,9 @@ export interface UploadInput {
 }
 
 export interface UploadResult {
-  /** Blob pathname (silme için saklanır → Asset.path). */
+  /** Blob pathname (silme/okuma için saklanır → Asset.path). */
   path: string;
-  /** Blob URL (tahmin-edilemez token; doğrudan erişilir → Asset.url). */
+  /** Blob URL (PRIVATE; yalnız token ile sunucudan okunur → Asset.url). */
   url: string;
 }
 
@@ -64,10 +64,10 @@ export interface UploadResult {
  * (çağıran taraf feature-flag ile bunu zarifçe yakalamalı).
  *
  * Not: `addRandomSuffix: false` — yükleme yolları çağıran tarafça zaten benzersiz
- * üretilir (`buildAssetPath`). `access: "public"` Blob'un TEK erişim modudur (private
- * read desteklenmez); URL tahmin-edilemez token içerir AMA imzasız/süresizdir → bu yüzden
- * ham URL istemciye ifşa EDİLMEZ, erişim kontrollü proxy/imzalı link ile verilir
- * (docs/13 §Y1, docs/06 §5b — `fetchBlobContent` + file-access.ts).
+ * üretilir (`buildAssetPath`). `access: "private"` (@vercel/blob ^2.4.0): blob yalnız
+ * `BLOB_READ_WRITE_TOKEN` ile sunucudan okunur (imzasız URL ile AÇILMAZ). İçerik admin
+ * auth-gated proxy'den `fetchBlobContent` ile servis edilir; müşteriye belge e-posta eki
+ * olarak gider (docs/13 §Y1, docs/06 §5b).
  */
 export async function uploadToStorage(input: UploadInput): Promise<UploadResult> {
   if (!isStorageConfigured()) {
@@ -88,7 +88,7 @@ export async function uploadToStorage(input: UploadInput): Promise<UploadResult>
   // Vercel Blob `put` Buffer/Blob/Stream kabul eder; ArrayBuffer/Uint8Array'i Buffer'a çevir.
   const bytes = input.body instanceof Uint8Array ? input.body : new Uint8Array(input.body);
   const result = await put(pathname, Buffer.from(bytes), {
-    access: "public",
+    access: "private",
     addRandomSuffix: false,
     contentType,
     token: process.env.BLOB_READ_WRITE_TOKEN,
@@ -98,7 +98,8 @@ export async function uploadToStorage(input: UploadInput): Promise<UploadResult>
 }
 
 /**
- * Bir veya birden çok Blob nesnesini kalıcı olarak siler (KVKK imha).
+ * Bir veya birden çok Blob nesnesini kalıcı olarak siler (KVKK imha). Private blob'larla
+ * uyumludur: `del` `BLOB_READ_WRITE_TOKEN` ile yetkilenir.
  * `urlsOrPaths` Asset.url (tam Blob URL) veya pathname olabilir; `del` her ikisini
  * de kabul eder.
  */
@@ -120,23 +121,32 @@ export interface BlobContent {
 }
 
 /**
- * Bir blob'un içeriğini SUNUCUDA çeker (docs/13 §Y1 kontrollü proxy/indirme için).
+ * PRIVATE bir blob'un içeriğini SUNUCUDA çeker (docs/13 §Y1 auth-gated proxy için).
  *
- * `url` HAM blob URL'idir (Asset.url) ve YALNIZCA SUNUCUDA kullanılır — bu fonksiyonun
- * dönüşü istemciye STREAM edilir, ham URL asla istemciye/HTML'e/redirect'e sızdırılmaz.
- * Çağıran rotalar (admin /dosya/[assetId], web /police-indir) erişim kontrolünü (auth /
- * imzalı token) KENDİLERİ yapar; bu fonksiyon yalnız içeriği getirir.
+ * `urlOrPath` Asset.url (private blob URL) veya pathname (Asset.path) olabilir. Blob
+ * `access:"private"` olduğundan token OLMADAN okunamaz — bu yüzden `get(..., {access:
+ * "private", token})` ile (SDK, Authorization header'ı otomatik ekler) çekilir ve dönüş
+ * istemciye STREAM edilir; içerik yalnız auth-gated admin proxy'sinden servis edilir.
  *
  * İçerik bulunamaz/erişilemezse hata fırlatır (çağıran 404/502'ye çevirir).
  */
-export async function fetchBlobContent(url: string): Promise<BlobContent> {
-  // Not: cache devre dışı — Next çağıran rotalar zaten `force-dynamic`/`no-store`.
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`fetchBlobContent: blob fetch failed (${res.status}).`);
+export async function fetchBlobContent(urlOrPath: string): Promise<BlobContent> {
+  if (!isStorageConfigured()) {
+    throw new StorageNotConfiguredError();
   }
-  const contentType = res.headers.get("content-type") || "application/octet-stream";
-  const body = await res.arrayBuffer();
+
+  // Private okuma: token ile origin'den çek (useCache:false → her zaman taze, izinli içerik).
+  const result = await get(urlOrPath, {
+    access: "private",
+    useCache: false,
+    token: process.env.BLOB_READ_WRITE_TOKEN,
+  });
+  if (!result || result.statusCode !== 200) {
+    throw new Error("fetchBlobContent: private blob bulunamadı veya okunamadı.");
+  }
+
+  const contentType = result.blob.contentType || "application/octet-stream";
+  const body = await new Response(result.stream).arrayBuffer();
   return { body, contentType };
 }
 

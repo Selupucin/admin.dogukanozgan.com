@@ -22,12 +22,9 @@ if (process.env.NODE_ENV !== "production") {
 // Prisma tarafından üretilen tipleri ve enum'ları yeniden dışa aktar.
 export * from "@prisma/client";
 
-// Vercel Blob depolama (yükleme + silme) yardımcıları — YALNIZCA sunucu.
+// Vercel Blob PRIVATE depolama (yükleme + token'lı okuma + silme) yardımcıları — docs/13 §Y1.
+// YALNIZCA sunucu.
 export * from "./storage";
-
-// Dosya erişim imzası (HMAC süreli token) — docs/13 §Y1. Ham blob URL'i ifşa etmeden
-// müşteriye süreli poliçe indirme linki verir. YALNIZCA sunucu.
-export * from "./file-access";
 
 // Sunucu-tarafı dosya doğrulama (MIME + magic-byte) — docs/13 §K2. YALNIZCA sunucu.
 export * from "./file-validation";

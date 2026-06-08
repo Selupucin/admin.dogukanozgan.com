@@ -11,7 +11,6 @@ import { Badge, Card, CardContent, CardHeader, CardTitle, buttonClass } from "@/
 import { StatusControl } from "./status-control";
 import { NoteForm } from "./note-form";
 import { KvkkActions } from "./kvkk-actions";
-import { PolicyDelivery } from "./policy-delivery";
 import { PolicyDates } from "./policy-dates";
 
 export const metadata: Metadata = {
@@ -250,7 +249,17 @@ export default async function TeklifDetayPage({ params }: { params: Promise<{ id
                   {STATUS_LABELS[quote.status]}
                 </Badge>
               </div>
-              <StatusControl quoteId={quote.id} current={quote.status} />
+              <StatusControl
+                quoteId={quote.id}
+                current={quote.status}
+                hasEmail={Boolean(quote.email)}
+                emailConfigured={emailConfigured}
+                storageConfigured={blobConfigured}
+              />
+              <p className="text-xs text-muted-foreground">
+                Teklif/Poliçe işaretlendiğinde müşteriye teslim (opsiyonel dosya + mesaj) penceresi
+                açılır.
+              </p>
               <p className="text-xs text-muted-foreground">
                 Son güncelleme: {formatDateTime(quote.updatedAt)}
               </p>
@@ -280,20 +289,10 @@ export default async function TeklifDetayPage({ params }: { params: Promise<{ id
                     start={quote.policyStartDate}
                     end={quote.policyEndDate}
                   />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Poliçe Yükle &amp; Gönder</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <PolicyDelivery
-                    quoteId={quote.id}
-                    hasEmail={Boolean(quote.email)}
-                    emailConfigured={emailConfigured}
-                    storageConfigured={blobConfigured}
-                  />
+                  <p className="text-xs text-muted-foreground">
+                    Poliçe belgesini müşteriye yeniden göndermek için CRM durumundan &ldquo;Poliçe
+                    Yapıldı&rdquo; teslim penceresini kullanın.
+                  </p>
                 </CardContent>
               </Card>
             </>

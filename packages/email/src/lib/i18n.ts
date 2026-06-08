@@ -66,6 +66,84 @@ export const quoteReceivedStrings = {
   },
 } as const;
 
+/**
+ * "Müşteri Teslim" şablonu metinleri (genel) — K28 / docs/12 §2.
+ * `kind` varyantı: "teklif" → "Teklifiniz hazırlandı", "police" → "Poliçeniz hazır".
+ * Ek (attachment) + serbest mesaj + durum linki opsiyoneldir; içerik yoksa standart
+ * "hazırlandı, en kısa sürede iletişime geçeceğiz" metni gösterilir.
+ */
+export type DeliveryKind = "teklif" | "police";
+
+export const customerDeliveryStrings = {
+  tr: {
+    // Konu satırı — kind'e göre.
+    subject: (kind: DeliveryKind, productName: string) =>
+      kind === "teklif"
+        ? `Teklifiniz hazırlandı — ${productName}`
+        : `Poliçeniz hazır — ${productName}`,
+    preview: (kind: DeliveryKind) =>
+      kind === "teklif"
+        ? "Teklifiniz hazırlandı. Detaylar e-postanızda."
+        : "Poliçeniz hazır. Detaylar e-postanızda.",
+    greeting: "Merhaba,",
+    // Ana başlık — kind'e göre.
+    intro: (kind: DeliveryKind, productName: string) =>
+      kind === "teklif"
+        ? `${productName} için teklifiniz hazırlanmıştır. İlginiz için teşekkür ederiz.`
+        : `${productName} poliçeniz hazırlanmıştır. Bizi tercih ettiğiniz için teşekkür ederiz.`,
+    summaryLabel: (kind: DeliveryKind) => (kind === "teklif" ? "Teklif" : "Poliçe"),
+    // İçerik (ek/mesaj) yoksa gösterilen standart metin — kind'e göre.
+    // TODO(doc): Nihai metin/dönüş süresi Doğukan'da (docs/12 §5).
+    standardBody: (kind: DeliveryKind) =>
+      kind === "teklif"
+        ? "Teklifinizle ilgili detayları paylaşmak için en kısa sürede sizinle iletişime geçeceğiz. Dilerseniz aşağıdaki iletişim bilgilerinden bize ulaşabilirsiniz."
+        : "Poliçenizle ilgili detayları paylaşmak için en kısa sürede sizinle iletişime geçeceğiz. Dilerseniz aşağıdaki iletişim bilgilerinden bize ulaşabilirsiniz.",
+    // Ek dosya iliştirildiğinde gövdede gösterilen bilgi — kind'e göre.
+    attachmentNotice: (kind: DeliveryKind) =>
+      kind === "teklif"
+        ? "Teklif belgeniz bu e-postanın ekinde gönderilmiştir."
+        : "Poliçe belgeniz bu e-postanın ekinde gönderilmiştir.",
+    // Admin'in girdiği serbest mesaj bloğu başlığı.
+    messageLabel: "Acentenizden not",
+    statusCta: "Durumu Görüntüle",
+    statusHint:
+      "Talebinizin güncel durumunu aşağıdaki bağlantıdan dilediğiniz zaman görüntüleyebilirsiniz:",
+    support: "Herhangi bir sorunuz olursa bizimle iletişime geçmekten çekinmeyin.",
+    closing: "Sağlıklı günler dileriz,",
+    signature: "Doğukan Özgan",
+  },
+  en: {
+    subject: (kind: DeliveryKind, productName: string) =>
+      kind === "teklif"
+        ? `Your quote is ready — ${productName}`
+        : `Your policy is ready — ${productName}`,
+    preview: (kind: DeliveryKind) =>
+      kind === "teklif"
+        ? "Your quote is ready. Details are in your email."
+        : "Your policy is ready. Details are in your email.",
+    greeting: "Hello,",
+    intro: (kind: DeliveryKind, productName: string) =>
+      kind === "teklif"
+        ? `Your quote for ${productName} is ready. Thank you for your interest.`
+        : `Your ${productName} policy is ready. Thank you for choosing us.`,
+    summaryLabel: (kind: DeliveryKind) => (kind === "teklif" ? "Quote" : "Policy"),
+    standardBody: (kind: DeliveryKind) =>
+      kind === "teklif"
+        ? "We will get in touch with you shortly to share the details of your quote. Feel free to reach us using the contact information below."
+        : "We will get in touch with you shortly to share the details of your policy. Feel free to reach us using the contact information below.",
+    attachmentNotice: (kind: DeliveryKind) =>
+      kind === "teklif"
+        ? "Your quote document is attached to this email."
+        : "Your policy document is attached to this email.",
+    messageLabel: "A note from your agent",
+    statusCta: "View Status",
+    statusHint: "You can view the current status of your request anytime via the link below:",
+    support: "If you have any questions, please do not hesitate to contact us.",
+    closing: "Wishing you well,",
+    signature: "Doğukan Özgan",
+  },
+} as const;
+
 /** "Poliçe Teslim" şablonu metinleri. */
 export const policyDeliveryStrings = {
   tr: {

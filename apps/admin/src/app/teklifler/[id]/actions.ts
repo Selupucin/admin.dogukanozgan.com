@@ -17,14 +17,13 @@ import {
   uploadToStorage,
   isStorageConfigured,
   validateUpload,
-  signFileToken,
   isValidObjectId,
   logError,
   type QuoteStatus,
 } from "@do/db";
-import { isEmailConfigured, sendPolicyDelivery } from "@do/email";
+import { isEmailConfigured, sendCustomerDelivery } from "@do/email";
 import { auth } from "@/auth";
-import { canTransition, QUOTE_STATUSES, productLabel } from "@/lib/crm";
+import { canTransition, QUOTE_STATUSES, productLabel, deliveryKindForStatus } from "@/lib/crm";
 
 async function requireAuth() {
   const session = await auth();
@@ -176,135 +175,219 @@ export async function anonymizeQuoteAction(quoteId: string): Promise<ActionResul
   return { ok: true };
 }
 
-export interface PolicyDeliveryResult extends ActionResult {
-  /** Müşteriye e-posta gönderildi mi? (e-posta yoksa / yapılandırma yoksa false) */
-  emailSent?: boolean;
-  /** Bilgilendirme notu (örn. "e-posta yapılandırılmadı"). */
-  notice?: string;
-}
+// Teslim belgesi azami boyut (MB). Boyut sunucuda validateUpload'da kesin uygulanır.
+const MAX_DELIVERY_MB = 15;
 
-const MAX_POLICY_MB = 15; // Poliçe belgesi azami boyut (MB). Boyut validateUpload'da uygulanır.
-
-// Poliçe indirme linki geçerlilik süresi (docs/13 §Y1). 30 gün — müşterinin maile
-// makul sürede erişimi için; süre dolunca yeni link talep eder.
-const POLICY_LINK_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-
-/** Blob içindeki poliçe belgesi yolu (kind="police"). */
-function buildPolicyPath(quoteId: string, originalName: string): string {
+/** Blob içindeki teslim belgesi yolu. kind: "police" | "teklif". */
+function buildDeliveryPath(
+  kind: "police" | "teklif",
+  quoteId: string,
+  originalName: string,
+): string {
   const safe = originalName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60);
   const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  return `police/${quoteId}/${unique}-${safe}`;
+  return `${kind}/${quoteId}/${unique}-${safe}`;
 }
 
-/**
- * Müşteriye gidecek İMZALI/SÜRELİ poliçe indirme linki (docs/13 §Y1). Ham blob URL
- * yerine web sitesindeki /police-indir rotasına token taşır. Site URL'i
- * NEXT_PUBLIC_SITE_URL (web). Token: signFileToken (HMAC, süreli).
- */
-function buildPolicyDownloadUrl(assetId: string): string {
+/** Müşterinin durum-takip sayfası tam URL'i (docs/12 §3). Takip kodu yoksa undefined. */
+function buildStatusUrl(trackingCode: string | null, locale: string): string | undefined {
+  if (!trackingCode) return undefined;
   const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://dogukanozgan.com").replace(/\/+$/, "");
-  const token = signFileToken({ assetId, expiresAt: Date.now() + POLICY_LINK_TTL_MS });
-  return `${base}/police-indir?token=${encodeURIComponent(token)}`;
+  const seg = locale === "en" ? "quote-status" : "teklif-durumu";
+  const loc = locale === "en" ? "en" : "tr";
+  return `${base}/${loc}/${seg}?code=${encodeURIComponent(trackingCode)}`;
 }
 
 /**
- * Poliçe belgesini yükler → teklife bağlar → müşteri e-postası varsa "Poliçe Teslim"
- * maili gönderir (K28+K32, docs/12 madde 9).
- * - Storage yoksa hata döner (feature flag).
- * - E-posta yapılandırılmamışsa yükleme yapılır ama mail atlanır (bilgilendirme döner).
+ * MÜŞTERİYE TESLİM (docs/05, docs/12 §2/§5) — `uploadAndSendPolicyAction`'ın yerini alan
+ * genelleştirilmiş action. Durum TEKLIF_VERILDI veya POLICE_YAPILDI işaretlenince modaldan
+ * çağrılır. Akış:
+ *   1) requireAuth + ObjectId guard.
+ *   2) Durum geçiş kuralını doğrula (canTransition; POLICE_YAPILDI yalnız TEKLIF_VERILDI'den).
+ *   3) POLICE_YAPILDI ise poliçe başlangıç + bitiş tarihi ZORUNLU (K32).
+ *   4) Dosya verildiyse: validateUpload (SUNUCUDA, magic-byte) → uploadToStorage (Blob) →
+ *      Asset kaydı (police → attachPolicyDocument/policyAssetId; teklif → kind="teklif").
+ *   5) Durumu güncelle + (varsa) poliçe tarihlerini ayarla.
+ *   6) statusOnly değilse e-posta: sendCustomerDelivery (ek = admin'in yüklediği belgenin
+ *      HAM BAYTLARI; mesaj React Email kaçışlı → XSS yok). E-posta yapılandırılmamış / e-posta
+ *      yoksa AKIŞ KIRILMAZ; durum yine güncellenir, uygun Not düşülür.
+ *   7) Zaman damgalı Not ekle (gönderildi/dosya var-yok/mesaj var-yok).
  */
-export async function uploadAndSendPolicyAction(
+export async function deliverToCustomerAction(
   quoteId: string,
   formData: FormData,
-): Promise<PolicyDeliveryResult> {
+): Promise<ActionResult> {
   await requireAuth();
 
+  // ObjectId guard (docs/13 §O1).
   if (!isValidObjectId(quoteId)) return { ok: false, error: "Geçersiz teklif." };
 
-  const file = formData.get("file");
-  if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, error: "Belge seçilmedi." };
+  // 1) Hedef durum + teslim türü.
+  const statusRaw = String(formData.get("status") ?? "");
+  if (!QUOTE_STATUSES.includes(statusRaw as QuoteStatus)) {
+    return { ok: false, error: "Geçersiz durum." };
   }
+  const target = statusRaw as QuoteStatus;
+  const kind = deliveryKindForStatus(target);
+  if (!kind) return { ok: false, error: "Bu durum teslim akışına uygun değil." };
 
-  // DOSYA TÜRÜ DOĞRULAMASI (docs/13 §K2) — boyut + içerik imzası (magic-byte).
-  // Poliçe belgesi: PDF veya görsel (JPG/PNG/WEBP). İstemcinin file.type'ına güvenilmez;
-  // tür imzadan belirlenir, geçersizse REDDEDİLİR.
-  const validation = await validateUpload(file, {
-    allowed: ["pdf", "jpeg", "png", "webp"],
-    maxSizeMb: MAX_POLICY_MB,
-  });
-  if (!validation.ok) {
-    if (validation.reason === "too-large") {
-      return { ok: false, error: `Belge çok büyük (en fazla ${MAX_POLICY_MB} MB).` };
-    }
-    return { ok: false, error: "Geçersiz dosya türü; yalnız PDF/JPG/PNG/WEBP yüklenebilir." };
-  }
+  const statusOnly = formData.get("statusOnly") === "1";
+  const message = String(formData.get("message") ?? "").trim();
+  if (message.length > 3000) return { ok: false, error: "Mesaj çok uzun." };
 
-  if (!isStorageConfigured()) {
-    return { ok: false, error: "Depolama yapılandırılmadı (BLOB_READ_WRITE_TOKEN eksik)." };
-  }
-
+  // 2) Mevcut durum + geçiş kuralı (istemciye GÜVENME — docs/05 sunucu doğrulaması).
   const quote = await prisma.quoteRequest.findUnique({
     where: { id: quoteId },
-    select: { id: true, email: true, product: true, locale: true },
+    select: {
+      id: true,
+      status: true,
+      email: true,
+      product: true,
+      locale: true,
+      trackingCode: true,
+    },
   });
   if (!quote) return { ok: false, error: "Teklif bulunamadı." };
 
-  // 1) Blob'a yükle. contentType = İMZA-DOĞRULANMIŞ MIME (docs/13 §K2), istemci beyanı değil.
-  let uploaded: { url: string; path: string };
-  try {
-    uploaded = await uploadToStorage({
-      path: buildPolicyPath(quoteId, file.name),
-      body: await file.arrayBuffer(),
-      contentType: validation.mime,
-    });
-  } catch (err) {
-    logError("[teklif-detay] poliçe yükleme hatası:", err);
-    return { ok: false, error: "Belge yüklenemedi." };
+  // Aynı duruma yeniden teslim (örn. POLICE_YAPILDI iken tekrar belge gönder) serbest.
+  if (quote.status !== target && !canTransition(quote.status, target)) {
+    if (target === "POLICE_YAPILDI") {
+      return { ok: false, error: "Önce 'Teklif Verildi' yapın." };
+    }
+    return { ok: false, error: "Bu duruma geçiş yapılamaz." };
   }
 
-  // 2) Teklife bağla (Asset kind="police" + policyAssetId).
-  const attached = await attachPolicyDocument(quoteId, {
-    url: uploaded.url,
-    path: uploaded.path,
-    // İmza-doğrulanmış MIME saklanır.
-    mimeType: validation.mime,
-    sizeBytes: file.size,
+  // 3) POLICE_YAPILDI → poliçe tarihleri ZORUNLU (K32).
+  let pStart: Date | null = null;
+  let pEnd: Date | null = null;
+  if (target === "POLICE_YAPILDI") {
+    pStart = parseDate(String(formData.get("policyStart") ?? ""));
+    pEnd = parseDate(String(formData.get("policyEnd") ?? ""));
+    if (!pStart || !pEnd) {
+      return { ok: false, error: "Poliçe başlangıç ve bitiş tarihi zorunludur." };
+    }
+    if (pEnd <= pStart) {
+      return { ok: false, error: "Bitiş tarihi başlangıçtan sonra olmalıdır." };
+    }
+  }
+
+  // 4) Dosya (opsiyonel). Verildiyse SUNUCUDA doğrula → Blob → Asset.
+  const rawFile = formData.get("file");
+  const hasFile = rawFile instanceof File && rawFile.size > 0;
+  let attachmentBytes: Uint8Array | null = null;
+  let attachmentName: string | null = null;
+  let attachmentMime: string | null = null;
+
+  if (hasFile) {
+    const file = rawFile as File;
+    // Boyut + içerik imzası (magic-byte) — istemci file.type'ına güvenilmez (docs/13 §K2).
+    const validation = await validateUpload(file, {
+      allowed: ["pdf", "jpeg", "png", "webp"],
+      maxSizeMb: MAX_DELIVERY_MB,
+    });
+    if (!validation.ok) {
+      if (validation.reason === "too-large") {
+        return { ok: false, error: `Belge çok büyük (en fazla ${MAX_DELIVERY_MB} MB).` };
+      }
+      return { ok: false, error: "Geçersiz dosya türü; yalnız PDF/JPG/PNG/WEBP yüklenebilir." };
+    }
+    if (!isStorageConfigured()) {
+      return { ok: false, error: "Depolama yapılandırılmadı (BLOB_READ_WRITE_TOKEN eksik)." };
+    }
+
+    // Ham baytlar: hem Blob'a yüklenir hem maile EK olarak doğrudan eklenir (istek md.3).
+    const buf = await file.arrayBuffer();
+    attachmentBytes = new Uint8Array(buf);
+    attachmentName = file.name;
+    attachmentMime = validation.mime;
+
+    let uploaded: { url: string; path: string };
+    try {
+      uploaded = await uploadToStorage({
+        path: buildDeliveryPath(kind, quoteId, file.name),
+        body: attachmentBytes,
+        contentType: validation.mime, // İmza-doğrulanmış MIME (docs/13 §K2).
+      });
+    } catch (err) {
+      logError("[teklif-detay] teslim belgesi yükleme hatası:", err);
+      return { ok: false, error: "Belge yüklenemedi." };
+    }
+
+    if (kind === "police") {
+      // Poliçe belgesi: Asset(kind="police") + QuoteRequest.policyAssetId (docs/12 §1).
+      const attached = await attachPolicyDocument(quoteId, {
+        url: uploaded.url,
+        path: uploaded.path,
+        mimeType: validation.mime,
+        sizeBytes: file.size,
+      });
+      if (!attached) return { ok: false, error: "Belge teklife bağlanamadı." };
+    } else {
+      // Teklif belgesi: genel Asset(kind="teklif").
+      await prisma.asset.create({
+        data: {
+          quoteId,
+          kind: "teklif",
+          url: uploaded.url,
+          path: uploaded.path,
+          mimeType: validation.mime,
+          sizeBytes: file.size,
+        },
+      });
+    }
+  }
+
+  // 5) Durumu güncelle + (POLICE_YAPILDI) poliçe tarihleri.
+  await prisma.quoteRequest.update({
+    where: { id: quoteId },
+    data: { status: target }, // updatedAt @updatedAt ile otomatik.
   });
-  if (!attached) return { ok: false, error: "Belge teklife bağlanamadı." };
+  if (target === "POLICE_YAPILDI" && pStart && pEnd) {
+    await setPolicyDates(quoteId, { start: pStart, end: pEnd });
+  }
+
+  // 6) E-posta (statusOnly değilse). Yapılandırma/e-posta yoksa akış KIRILMAZ.
+  let mailNote: string;
+  if (statusOnly) {
+    mailNote = "mail gönderilmedi (yalnız durum güncellendi)";
+  } else if (!quote.email) {
+    mailNote = "mail gönderilemedi (müşteri e-postası yok)";
+  } else if (!isEmailConfigured()) {
+    mailNote = "mail gönderilemedi (e-posta yapılandırması yok)";
+  } else {
+    const sent = await sendCustomerDelivery({
+      to: quote.email,
+      kind,
+      productName: productLabel(quote.product),
+      message: message || undefined,
+      // EK = admin'in yüklediği belgenin HAM BAYTLARI (istek md.3).
+      attachment:
+        attachmentBytes && attachmentName && attachmentMime
+          ? {
+              filename: attachmentName,
+              content: attachmentBytes,
+              contentType: attachmentMime,
+            }
+          : undefined,
+      statusUrl: buildStatusUrl(quote.trackingCode, quote.locale),
+      locale: quote.locale,
+    });
+    mailNote = sent.ok ? "mail gönderildi" : "mail gönderilemedi (gönderim hatası)";
+  }
+
+  // 7) Zaman damgalı Not (Note modeli) — kanıt/izleme.
+  const label = kind === "teklif" ? "Teklif" : "Poliçe";
+  await prisma.note.create({
+    data: {
+      quoteId,
+      body:
+        `${label} müşteriye gönderildi — dosya: ${hasFile ? "var" : "yok"}, ` +
+        `mesaj: ${message ? "var" : "yok"}; ${mailNote}.`,
+    },
+  });
 
   revalidatePath(`/teklifler/${quoteId}`);
-
-  // İmzalı/süreli indirme linki (docs/13 §Y1) — ham blob URL maile KONULMAZ.
-  const policyUrl = buildPolicyDownloadUrl(attached.assetId);
-
-  // 3) Müşteriye "Poliçe Teslim" maili (varsa). E-posta yoksa/yapılandırma yoksa atla.
-  if (!quote.email) {
-    return { ok: true, emailSent: false, notice: "Müşteri e-postası yok — mail gönderilmedi." };
-  }
-  if (!isEmailConfigured()) {
-    return {
-      ok: true,
-      emailSent: false,
-      notice: "E-posta yapılandırılmadı — belge yüklendi, mail gönderilmedi.",
-    };
-  }
-
-  const sent = await sendPolicyDelivery({
-    to: quote.email,
-    productName: productLabel(quote.product),
-    // İmzalı/süreli link (docs/13 §Y1) — ham public blob URL DEĞİL.
-    policyUrl,
-    locale: quote.locale,
-  });
-
-  if (!sent.ok) {
-    return {
-      ok: true,
-      emailSent: false,
-      notice: "Belge yüklendi ancak e-posta gönderilemedi.",
-    };
-  }
-
-  return { ok: true, emailSent: true, notice: "Belge yüklendi ve müşteriye e-posta gönderildi." };
+  revalidatePath("/teklifler");
+  revalidatePath("/policeler");
+  return { ok: true };
 }

@@ -37,16 +37,21 @@ export const STATUS_BADGE_CLASS: Record<QuoteStatus, string> = {
 
 /**
  * Bir durumdan izin verilen hedef durumlar (docs/05 akışı).
- * - Akış ileri yönlüdür; her aşamadan IPTAL'e geçilebilir.
+ * - Akış ileri yönlüdür; tek adım ileri ZORUNLU DEĞİL ama POLICE_YAPILDI'ya YALNIZ
+ *   TEKLIF_VERILDI'den geçilebilir (önce teklif verilmeden poliçe yapılamaz). Bu kural
+ *   hem UI'da (status-control disabled) hem sunucuda (updateStatusAction) uygulanır.
+ * - Her aşamadan IPTAL'e geçilebilir; geri/düzeltme amaçlı YENI'ye dönüş serbesttir.
  * - POLICE_YAPILDI ve IPTAL "son" durumdur (geri açmak istenirse YENI'ye dönülebilir
  *   — yanlış işaretlemeyi düzeltmek için makul; docs/05 audit log netleşince kısıtlanır).
  */
 export function allowedTransitions(current: QuoteStatus): QuoteStatus[] {
   switch (current) {
     case "YENI":
-      return ["ARANDI", "TEKLIF_VERILDI", "POLICE_YAPILDI", "IPTAL"];
+      // POLICE_YAPILDI YOK: önce TEKLIF_VERILDI yapılmalı.
+      return ["ARANDI", "TEKLIF_VERILDI", "IPTAL"];
     case "ARANDI":
-      return ["TEKLIF_VERILDI", "POLICE_YAPILDI", "IPTAL", "YENI"];
+      // POLICE_YAPILDI YOK: önce TEKLIF_VERILDI yapılmalı.
+      return ["TEKLIF_VERILDI", "IPTAL", "YENI"];
     case "TEKLIF_VERILDI":
       return ["POLICE_YAPILDI", "IPTAL", "ARANDI", "YENI"];
     case "POLICE_YAPILDI":
@@ -62,6 +67,29 @@ export function allowedTransitions(current: QuoteStatus): QuoteStatus[] {
 export function canTransition(from: QuoteStatus, to: QuoteStatus): boolean {
   if (from === to) return false;
   return allowedTransitions(from).includes(to);
+}
+
+/**
+ * Bir hedef durum, mevcut durumdan SEÇİLEBİLİR mi ama AKIŞ KURALI nedeniyle ENGELLİ mi?
+ * status-control bu durumda seçeneği "disabled + ipucu" gösterir (gizlemek yerine).
+ * Şu an yalnız POLICE_YAPILDI: TEKLIF_VERILDI veya POLICE_YAPILDI değilse engellidir.
+ * @returns ipucu metni (engelliyse) veya null (engel yok).
+ */
+export function transitionBlockedReason(current: QuoteStatus, target: QuoteStatus): string | null {
+  if (target === "POLICE_YAPILDI" && current !== "TEKLIF_VERILDI" && current !== "POLICE_YAPILDI") {
+    return "Önce 'Teklif Verildi' yapın";
+  }
+  return null;
+}
+
+/** Teslim modalı açan durumlar (TEKLIF_VERILDI / POLICE_YAPILDI). */
+export const DELIVERY_STATUSES: QuoteStatus[] = ["TEKLIF_VERILDI", "POLICE_YAPILDI"];
+
+/** Teslim durumunu @do/email DeliveryKind'ine eşler ("teklif" | "police"). */
+export function deliveryKindForStatus(status: QuoteStatus): "teklif" | "police" | null {
+  if (status === "TEKLIF_VERILDI") return "teklif";
+  if (status === "POLICE_YAPILDI") return "police";
+  return null;
 }
 
 /** Ürün slug → TR ad (definitions.ts'ten; bilinmeyen slug için slug'ın kendisi). */
