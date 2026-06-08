@@ -7,6 +7,7 @@
 //                          statusUrl?, locale })                               -> SendResult
 //   sendPolicyDelivery({ to, productName, policyUrl?, attachment?, message?,
 //                        locale })  (geriye uyum → sendCustomerDelivery)       -> SendResult
+//   sendLoginCode({ to, code, expiresMinutes?, locale })                       -> SendResult
 //   isEmailConfigured()  -> boolean (feature flag)
 //
 // Faz 2: apps/web teklif action'ı + apps/admin teslim (teklif/poliçe gönder) action'ı
@@ -16,10 +17,12 @@ export {
   sendQuoteReceived,
   sendCustomerDelivery,
   sendPolicyDelivery,
+  sendLoginCode,
   isEmailConfigured,
   type SendQuoteReceivedInput,
   type SendCustomerDeliveryInput,
   type SendPolicyDeliveryInput,
+  type SendLoginCodeInput,
   type EmailAttachment,
 } from "./send";
 
@@ -38,5 +41,6 @@ export {
   PolicyDeliveryEmail,
   type PolicyDeliveryEmailProps,
 } from "./templates/PolicyDeliveryEmail";
+export { LoginCodeEmail, type LoginCodeEmailProps } from "./templates/LoginCodeEmail";
 
 export { normalizeLocale, type Locale, type DeliveryKind } from "./lib/i18n";

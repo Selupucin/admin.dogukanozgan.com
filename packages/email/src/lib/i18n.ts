@@ -144,6 +144,41 @@ export const customerDeliveryStrings = {
   },
 } as const;
 
+/**
+ * "Admin Giriş Doğrulama Kodu" (OTP) şablonu metinleri — K28 / docs/12 §2.
+ * Transactional (2FA). Kod ÇAĞRI sırasında verilir (admin tarafı üretir/saklar);
+ * bu paket yalnız gönderir. Kod loglanmaz (docs/12).
+ */
+export const loginCodeStrings = {
+  tr: {
+    subject: "Admin giriş doğrulama kodunuz",
+    preview: "Admin paneli giriş doğrulama kodunuz.",
+    greeting: "Merhaba,",
+    intro: "Admin paneline giriş için doğrulama kodunuz aşağıdadır.",
+    codeLabel: "Doğrulama kodunuz",
+    // X dakika değeri çağrı sırasında (expiresMinutes) verilir.
+    expiry: (minutes: number) =>
+      `Bu kodu yalnız siz girmelisiniz; kod ${minutes} dakika geçerlidir.`,
+    securityNotice:
+      "Bu girişi siz yapmadıysanız bu e-postayı dikkate almayın ve hesabınızın güvenliği için şifrenizi değiştirin.",
+    closing: "Sevgiler,",
+    signature: "Doğukan Özgan",
+  },
+  en: {
+    subject: "Your admin login verification code",
+    preview: "Your verification code for the admin panel.",
+    greeting: "Hello,",
+    intro: "Below is your verification code to sign in to the admin panel.",
+    codeLabel: "Your verification code",
+    expiry: (minutes: number) =>
+      `Only you should enter this code; it is valid for ${minutes} minutes.`,
+    securityNotice:
+      "If you did not attempt this sign-in, please ignore this email and change your password to keep your account secure.",
+    closing: "Best regards,",
+    signature: "Doğukan Özgan",
+  },
+} as const;
+
 /** "Poliçe Teslim" şablonu metinleri. */
 export const policyDeliveryStrings = {
   tr: {

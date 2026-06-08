@@ -21,8 +21,14 @@ if (!secret && process.env.NODE_ENV === "production") {
   );
 }
 
+// Statik oturum/çerez ömrü ÜST SINIRI. Gerçek geçerlilik JWT'deki `sessionExpiresAt`
+// claim'i ile belirlenir (docs/05 — "Beni hatırla" + süre seçimi). Bu üst sınırı uzun
+// tutarız ("her zaman" ~10 yıl seçeneğini de kapsasın) ki kısa süreli oturumlar maxAge
+// nedeniyle erken DÜŞMESİN; asıl kesme `sessionExpiresAt` kontrolüyle yapılır.
+const MAX_SESSION_AGE_SECONDS = 3650 * 24 * 60 * 60; // ~10 yıl
+
 export const authConfig: NextAuthConfig = {
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: MAX_SESSION_AGE_SECONDS },
   trustHost: true,
   // Bu ayar hem middleware (auth.config) hem auth.ts (spread) tarafından kullanılır.
   secret,
@@ -36,7 +42,13 @@ export const authConfig: NextAuthConfig = {
     // /login ve /api/auth/* serbest bırakılır (sonsuz döngü olmasın).
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
-      const isLoggedIn = Boolean(auth?.user);
+
+      // Oturum geçerli mi? token'daki `sessionExpiresAt` claim'i süresini belirler
+      // (docs/05 — seçilen "Beni hatırla" süresi). Süresi geçmişse oturum YOK sayılır.
+      const expiresAt =
+        typeof auth?.sessionExpiresAt === "number" ? auth.sessionExpiresAt : undefined;
+      const notExpired = expiresAt === undefined || Date.now() <= expiresAt;
+      const isLoggedIn = Boolean(auth?.user) && notExpired;
 
       const isAuthRoute = pathname.startsWith("/api/auth");
       const isLoginPage = pathname === "/login";
@@ -55,8 +67,19 @@ export const authConfig: NextAuthConfig = {
       return isLoggedIn;
     },
     async jwt({ token, user }) {
+      // İlk girişte (user var): rol + oturum bitiş zamanını (sessionExpiresAt) ayarla.
+      // authorize, ticket'taki remember/duration'a göre `sessionMaxAgeMs` döndürdü.
       if (user && "role" in user) {
         token.role = (user as { role?: string }).role ?? "ADMIN";
+        const maxAgeMs = (user as { sessionMaxAgeMs?: number }).sessionMaxAgeMs;
+        if (typeof maxAgeMs === "number" && maxAgeMs > 0) {
+          token.sessionExpiresAt = Date.now() + maxAgeMs;
+        }
+      }
+      // Sonraki çağrılarda: süresi geçmişse token'ı GEÇERSİZ kıl (boş döndür → oturum düşer).
+      const exp = typeof token.sessionExpiresAt === "number" ? token.sessionExpiresAt : undefined;
+      if (exp !== undefined && Date.now() > exp) {
+        return null;
       }
       return token;
     },
@@ -64,6 +87,10 @@ export const authConfig: NextAuthConfig = {
       if (session.user) {
         session.user.role = (token.role as string) ?? "ADMIN";
         if (token.sub) session.user.id = token.sub;
+      }
+      // `authorized` (middleware/edge) bu alanı okuyup süresi geçmiş oturumu reddeder.
+      if (typeof token.sessionExpiresAt === "number") {
+        (session as { sessionExpiresAt?: number }).sessionExpiresAt = token.sessionExpiresAt;
       }
       return session;
     },

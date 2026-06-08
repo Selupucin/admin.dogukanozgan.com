@@ -210,6 +210,31 @@ enum NotificationType {
   POLICE_BITIS // Yaklaşan/biten poliçe
 }
 
+// İki adımlı admin girişi (2FA) — e-posta OTP doğrulama kodu. docs/05 (Kimlik Doğrulama).
+//
+// AKIŞ (apps/admin login): şifre doğrulandıktan SONRA 6 haneli rastgele kod üretilir,
+// HASH'lenip (sha256 + AUTH_SECRET) buraya yazılır, e-postayla gönderilir. Adım 2'de
+// kullanıcı kodu girer; hash eşleşir + süre (10dk) geçmemiş + deneme < 5 ise oturum açılır.
+// Kod ASLA düz metin saklanmaz; başarılı/iptal sonrası satır SİLİNİR.
+//
+// Tek-admin senaryosunda e-posta başına en çok bir aktif kod tutulur (upsert);
+// `email @unique` bunu garanti eder. `expiresAt` index ile süresi geçenler sorgulanır
+// (TTL otomatik silme isteğe bağlı; RateLimit ile aynı not — Atlas'ta el ile kurulabilir).
+//
+// ⚠️ db push UYARISI: Bu yeni koleksiyon CANLI MongoDB Atlas'a HENÜZ uygulanMADI.
+// Kullanıcı uygular: `pnpm --filter @do/db db:push` (yeni `LoginCode` koleksiyonu + index).
+// Agent yalnız `prisma generate` ile client'ı günceller.
+model LoginCode {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique // normalize (lowercase) admin e-postası — aktif kod sahibi
+  codeHash  String // sha256(code + AUTH_SECRET) — düz kod ASLA saklanmaz
+  expiresAt DateTime // kodun geçerlilik bitişi (üretim + 10dk)
+  attempts  Int      @default(0) // yanlış deneme sayacı; >=5 olunca kod geçersiz
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
 // Dağıtık (kalıcı) rate-limit sayacı — docs/13 §Y2.
 // Mevcut MongoDB üzerinde tutulur (Upstash/Redis gibi EK SERVİS KURULMAZ — kullanıcı
 // kararı: non-teknik, ek altyapı istenmez). In-memory limiter serverless'te her

@@ -9,10 +9,12 @@ import { render } from "@react-email/render";
 import { getResend, getFromAddress, isEmailConfigured, type SendResult } from "./client";
 import { QuoteReceivedEmail } from "./templates/QuoteReceivedEmail";
 import { CustomerDeliveryEmail } from "./templates/CustomerDeliveryEmail";
+import { LoginCodeEmail } from "./templates/LoginCodeEmail";
 import {
   normalizeLocale,
   quoteReceivedStrings,
   customerDeliveryStrings,
+  loginCodeStrings,
   type DeliveryKind,
 } from "./lib/i18n";
 
@@ -182,6 +184,64 @@ export async function sendPolicyDelivery(input: SendPolicyDeliveryInput): Promis
     statusUrl: input.policyUrl,
     locale: input.locale,
   });
+}
+
+/** Doğrulama kodu varsayılan geçerlilik süresi (dakika). */
+const DEFAULT_LOGIN_CODE_EXPIRY_MINUTES = 10;
+
+export interface SendLoginCodeInput {
+  /** Alıcı e-posta adresi (admin). */
+  to: string;
+  /** Doğrulama kodu. Admin tarafı üretir/saklar; bu fonksiyon yalnız gönderir. */
+  code: string;
+  /** Kodun geçerlilik süresi (dakika). Varsayılan 10. */
+  expiresMinutes?: number;
+  /** "tr" | "en" (varsayılan tr). */
+  locale?: string;
+}
+
+/**
+ * Admin "Giriş Doğrulama Kodu" (OTP / 2FA) e-postası gönderir. Yapılandırma yoksa
+ * zarifçe atlar ({ ok:false, skipped:true }).
+ *
+ * GÜVENLİK: `code` ASLA loglanmaz (docs/12). Kod yalnızca şablonda render edilir;
+ * hata loglarında yer almaz.
+ */
+export async function sendLoginCode(input: SendLoginCodeInput): Promise<SendResult> {
+  const locale = normalizeLocale(input.locale);
+  const expiresMinutes = input.expiresMinutes ?? DEFAULT_LOGIN_CODE_EXPIRY_MINUTES;
+  const resend = getResend();
+  if (!resend) {
+    return { ok: false, skipped: true };
+  }
+
+  try {
+    const element = LoginCodeEmail({
+      code: input.code,
+      expiresMinutes,
+      locale,
+    });
+    const html = await render(element);
+    const text = await render(element, { plainText: true });
+
+    const { data, error } = await resend.emails.send({
+      from: getFromAddress(),
+      to: input.to,
+      subject: loginCodeStrings[locale].subject,
+      html,
+      text,
+    });
+
+    if (error) {
+      // Kod loglanmaz — yalnızca hata mesajı.
+      console.error("[@do/email] sendLoginCode failed:", error);
+      return { ok: false, error: error.message };
+    }
+    return { ok: true, id: data?.id };
+  } catch (err) {
+    console.error("[@do/email] sendLoginCode threw:", err);
+    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+  }
 }
 
 // Yeniden ihraç (çağıranların flag kontrolü yapabilmesi için).

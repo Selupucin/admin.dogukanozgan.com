@@ -9,15 +9,21 @@ declare module "next-auth" {
       id: string;
       role: string;
     } & DefaultSession["user"];
+    /** Oturumun bitiş zamanı (ms epoch) — "Beni hatırla" + süre seçimi (docs/05). */
+    sessionExpiresAt?: number;
   }
 
   interface User {
     role?: string;
+    /** authorize → jwt: oturum ömrü (ms). jwt callback bunu sessionExpiresAt'e çevirir. */
+    sessionMaxAgeMs?: number;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     role?: string;
+    /** Oturum bitiş zamanı (ms epoch); süresi geçince jwt callback token'ı düşürür. */
+    sessionExpiresAt?: number;
   }
 }

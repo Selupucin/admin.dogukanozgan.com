@@ -35,6 +35,9 @@ export * from "./kvkk";
 // Admin kimlik doğrulama yardımcıları (şifre hash + Credentials doğrulama).
 export * from "./auth";
 
+// İki adımlı giriş (2FA) e-posta OTP yardımcıları (üret/doğrula/sil) — docs/05. Sunucu-only.
+export * from "./login-code";
+
 // Teklif durum-takip kodu (K30) — üretim + KVKK-güvenli durum sorgusu.
 export * from "./tracking";
 
