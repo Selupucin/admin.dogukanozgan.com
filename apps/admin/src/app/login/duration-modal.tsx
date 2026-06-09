@@ -89,7 +89,7 @@ export function DurationModal({ initialValue, onConfirm, onCancel }: DurationMod
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-foreground/50 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-background/80 p-0 backdrop-blur-sm sm:items-center sm:p-6"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onCancel();
       }}
@@ -133,13 +133,16 @@ export function DurationModal({ initialValue, onConfirm, onCancel }: DurationMod
                 <label
                   key={opt.value}
                   className={cn(
-                    "flex min-h-[44px] cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-colors",
-                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1 focus-within:ring-offset-background",
+                    "group flex min-h-[44px] cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-colors",
+                    // Tek tutarlı focus halkası (klavye): native outline'lar kaldırıldı,
+                    // yalnız bu focus-within çift halka yapmadan ring gösterir (docs/09).
+                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
                     isSelected
-                      ? "border-primary bg-primary/5"
-                      : "border-input hover:border-primary/50 hover:bg-muted/40",
+                      ? "border-secondary bg-accent"
+                      : "border-border hover:border-secondary/50 hover:bg-accent/40",
                   )}
                 >
+                  {/* Tarayıcı varsayılan radyosu görsel olarak gizli; tek temiz custom gösterge. */}
                   <input
                     ref={i === 0 ? firstOptionRef : undefined}
                     type="radio"
@@ -147,8 +150,24 @@ export function DurationModal({ initialValue, onConfirm, onCancel }: DurationMod
                     value={opt.value}
                     checked={isSelected}
                     onChange={() => setSelected(opt.value)}
-                    className="mt-0.5 h-4 w-4 shrink-0 border-input text-primary focus:ring-2 focus:ring-ring"
+                    className="sr-only"
                   />
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors",
+                      isSelected
+                        ? "border-secondary"
+                        : "border-input group-hover:border-secondary/60",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "h-2 w-2 rounded-full bg-secondary transition-transform",
+                        isSelected ? "scale-100" : "scale-0",
+                      )}
+                    />
+                  </span>
                   <span className="flex flex-col gap-0.5">
                     <span className="text-sm font-medium text-foreground">{opt.label}</span>
                     <span className="text-xs text-muted-foreground">{opt.hint}</span>

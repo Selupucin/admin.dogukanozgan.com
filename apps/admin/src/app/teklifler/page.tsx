@@ -12,6 +12,7 @@ import {
 import { formatDate, telHref, whatsappHref } from "@/lib/contact";
 import { Badge, Card, buttonClass } from "@/components/ui";
 import { Filters } from "./filters";
+import { QuoteRowDelete } from "./quote-row-delete";
 
 export const metadata: Metadata = {
   title: "Teklifler — Yönetim",
@@ -198,10 +199,13 @@ function QuotesTable({ quotes }: { quotes: QuoteListItem[] }) {
                 <td className="px-4 py-3">
                   <Badge className={STATUS_BADGE_CLASS[q.status]}>{STATUS_LABELS[q.status]}</Badge>
                 </td>
-                <td className="px-4 py-3">
-                  <Link href={`/teklifler/${q.id}`} className={buttonClass("outline", "sm")}>
-                    Detay
-                  </Link>
+                <td className="whitespace-nowrap px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Link href={`/teklifler/${q.id}`} className={buttonClass("outline", "sm")}>
+                      Detay
+                    </Link>
+                    <QuoteRowDelete quoteId={q.id} />
+                  </div>
                 </td>
               </tr>
             ))}

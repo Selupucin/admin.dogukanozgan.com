@@ -119,6 +119,11 @@ model Note {
 }
 
 // Admin kullanıcılar (Auth.js)
+//
+// PIN KİLİT (docs/05 "Boşta Kilit / PIN"): Giriş oturumu açıkken, panel bir süre boşta
+// kalınca tam ekran kilit overlay'i 4 haneli PIN ister (şifre tekrar sorulmaz). PIN
+// bcrypt ile hash'lenir (pinHash); düz PIN ASLA saklanmaz. Kilit yalnız UI gate'tir —
+// oturum JWT'si geçerli kalır, ama PIN doğrulaması her zaman SUNUCUDA yapılır.
 model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   email        String   @unique
@@ -127,6 +132,14 @@ model User {
   // provider bunu doğrular. Nullable: ileride OAuth/adapter kullanıcısı eklenirse
   // şifresiz hesap mümkün olsun (şimdilik tek credentials admin).
   passwordHash String?
+  // 4 haneli boşta-kilit PIN'inin bcrypt HASH'i. null = PIN henüz oluşturulmadı
+  // (ilk girişte kapatılamaz modal ile kurulur). Düz PIN saklanmaz/loglanmaz.
+  pinHash      String?
+  // Boşta kalınca kilitlenme süresi (dakika). 0 = kilit KAPALI. İzinli: 0/5/15/30/60.
+  // docs/05 — süre ayarlardan değiştirilebilir veya kapatılabilir. Varsayılan 15 dk.
+  lockTimeoutMinutes Int @default(15)
+  // PIN'in en son ne zaman ayarlandığı/değiştirildiği (bilgi amaçlı, audit'e yardımcı).
+  pinUpdatedAt DateTime?
   role         Role     @default(ADMIN)
   createdAt    DateTime @default(now())
   // Auth.js JWT oturumu kullanılır (Aşama 3) → Account/Session tablosu GEREKMEZ.

@@ -12,6 +12,7 @@ const NAV = [
   { href: "/teklifler", label: "Teklifler" },
   { href: "/iletisim-talepleri", label: "İletişim" },
   { href: "/policeler", label: "Poliçeler" },
+  { href: "/ayarlar", label: "Ayarlar" },
 ];
 
 export async function AppHeader({ email }: { email?: string | null }) {

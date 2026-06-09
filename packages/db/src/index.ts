@@ -38,6 +38,9 @@ export * from "./auth";
 // İki adımlı giriş (2FA) e-posta OTP yardımcıları (üret/doğrula/sil) — docs/05. Sunucu-only.
 export * from "./login-code";
 
+// Admin boşta-kilit PIN yardımcıları (kur/doğrula/değiştir + kilit süresi) — docs/05. Sunucu-only.
+export * from "./admin-security";
+
 // Teklif durum-takip kodu (K30) — üretim + KVKK-güvenli durum sorgusu.
 export * from "./tracking";
 
