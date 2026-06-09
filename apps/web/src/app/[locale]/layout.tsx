@@ -78,6 +78,10 @@ export async function generateMetadata({
       title: t("homeTitle"),
       description: t("homeDescription"),
     },
+    // Google Search Console doğrulaması (docs/07 / docs/10 env). Env değişkeni SET ise
+    // Next `<meta name="google-site-verification" ...>` render eder; BOŞ/undefined ise
+    // hiçbir şey eklenmez (güvenli varsayılan). Kod değişmeden Vercel env ile çalışır.
+    verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
     robots: { index: true, follow: true },
   };
 }
