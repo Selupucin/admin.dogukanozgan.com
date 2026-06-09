@@ -14,10 +14,15 @@ import type { NextAuthConfig } from "next-auth";
 // (sessiz fallback ile imzasız/zayıf oturum üretilmesini engelle). Dev'de sessiz geçilir
 // (Auth.js dev'de geçici bir secret türetebilir).
 const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+// docs/13 §O2 — secret eksikse UYAR (THROW ETME). Modül-yükleme zamanında throw etmek,
+// bu modülü import eden Edge middleware + Node server-component zincirini tamamen çökertip
+// tüm admin'i opak bir 500'e düşürüyordu (env geç yüklenirse/eksikse teşhisi zor). NextAuth
+// zaten secret olmadan imzalama/çözme işlemini güvenle reddeder; bu yüzden burada yalnız
+// sunucu logu düşürüp devam ediyoruz (site render olur, sorun login işleminde netleşir).
 if (!secret && process.env.NODE_ENV === "production") {
-  throw new Error(
-    "AUTH_SECRET zorunludur (production). AUTH_SECRET veya NEXTAUTH_SECRET tanımlayın " +
-      "(`openssl rand -base64 32`). docs/13 §O2.",
+  console.error(
+    "[auth] UYARI: AUTH_SECRET tanımlı değil. Vercel admin projesine AUTH_SECRET ekleyip " +
+      "REDEPLOY edin (docs/13 §O2). Giriş çalışmayacaktır.",
   );
 }
 

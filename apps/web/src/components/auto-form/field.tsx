@@ -179,6 +179,9 @@ function FileControl({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [guideOpen, setGuideOpen] = useState(false);
+  // "Anladım" sonrası programatik .click()'in input onClick'ini TEKRAR yakalayıp modalı
+  // yeniden açmasını engeller (aksi halde native seçici hiç açılmaz — kısır döngü).
+  const bypassGuideRef = useRef(false);
 
   // file: buton hover (teal/accent koyulaşma) + cursor-pointer + yumuşak geçiş (docs/09).
   const fileClass = cn(
@@ -203,9 +206,14 @@ function FileControl({
             onChange={(e) => rhf.onChange(e.target.files?.[0])}
             onBlur={rhf.onBlur}
             // captureGuide: yükleme tetiklenince ÖNCE modalı aç; native seçiciyi engelle.
+            // Programatik tıklama (Anladım sonrası) bypassGuideRef ile geçer → native açılır.
             onClick={
               field.captureGuide
                 ? (e) => {
+                    if (bypassGuideRef.current) {
+                      bypassGuideRef.current = false;
+                      return; // native dosya seçiciye izin ver
+                    }
                     e.preventDefault();
                     setGuideOpen(true);
                   }
@@ -219,9 +227,10 @@ function FileControl({
               onClose={() => setGuideOpen(false)}
               onConfirm={() => {
                 setGuideOpen(false);
-                // Modal kapandıktan sonra native dosya seçiciyi aç.
-                // requestAnimationFrame: DOM güncellenip overflow geri gelince tıkla.
-                requestAnimationFrame(() => inputRef.current?.click());
+                // Native dosya seçiciyi AÇ. bypass bayrağı sayesinde input onClick modalı
+                // yeniden açmaz. Kullanıcı jesti içinde senkron çağrılır (tarayıcı izni için).
+                bypassGuideRef.current = true;
+                inputRef.current?.click();
               }}
             />
           )}
