@@ -14,6 +14,7 @@
 // arka plan kaydırması kilitli.
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle, X } from "lucide-react";
 import { cn } from "@do/ui";
 import { buttonClass } from "@/components/ui";
@@ -118,7 +119,12 @@ export function DeleteConfirmModal({
     onConfirm();
   }
 
-  return (
+  // Body'ye portal: liste tablosu gibi overflow-x-auto / containing-block oluşturan bir
+  // ataya gömülünce `fixed` modal sıkışıp yatay kaydırma yapıyordu. Portal ile her zaman
+  // viewport seviyesinde, tam genişlikte açılır (detay sayfasında da aynı çalışır).
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-end justify-center bg-foreground/50 p-0 backdrop-blur-sm sm:items-center sm:p-6"
       onMouseDown={(e) => {
@@ -251,6 +257,7 @@ export function DeleteConfirmModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -19,6 +19,7 @@
 //   - Kilit overlay yalnız UI gate; oturum JWT geçerli kalır ama PIN doğrulaması SUNUCUDA.
 
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import {
   setUserPin,
   verifyUserPin,
@@ -75,6 +76,9 @@ export async function setupPinAction(formData: FormData): Promise<SecurityAction
 
   const res = await setUserPin(email, pin);
   if (!res.ok) return { ok: false, error: PIN_FORMAT_ERROR };
+  // Tüm korumalı layout'ların `hasPin` verisini tazele — aksi halde başka sayfaya gidip
+  // dönünce eski (hasPin=false) cache servis edilip kurulum modalı TEKRAR açılıyordu.
+  revalidatePath("/", "layout");
   return { ok: true, message: "PIN oluşturuldu." };
 }
 
@@ -122,6 +126,8 @@ export async function updateLockTimeoutAction(minutes: number): Promise<Security
   if (!isAllowedLockTimeout(minutes)) return { ok: false, error: GENERIC_ERROR };
   const res = await updateLockTimeout(email, minutes);
   if (!res.ok) return { ok: false, error: GENERIC_ERROR };
+  // Kilit süresi değişikliği korumalı layout'lardaki guard'a yansısın.
+  revalidatePath("/", "layout");
   return {
     ok: true,
     message:

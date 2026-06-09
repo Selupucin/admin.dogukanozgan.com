@@ -15,6 +15,7 @@
 // (yeniden yüklemede kilit durumunu hatırlamak) içindir.
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Lock, ShieldCheck } from "lucide-react";
 import { buttonClass } from "@/components/ui";
 import { PinInput } from "@/components/pin-input";
@@ -41,6 +42,7 @@ function maskEmail(email: string): string {
 }
 
 export function PinLockGuard({ hasPin, lockTimeoutMinutes, email }: PinLockGuardProps) {
+  const router = useRouter();
   // PIN durumu — kurulum sonrası true olur (modal kapanır, kilit izleme başlar).
   const [pinSet, setPinSet] = useState(hasPin);
   // Kilit overlay görünür mü?
@@ -117,7 +119,16 @@ export function PinLockGuard({ hasPin, lockTimeoutMinutes, email }: PinLockGuard
 
   // İlk giriş: kurulum modalı (kapatılamaz).
   if (!pinSet) {
-    return <SetupPinModal onDone={() => setPinSet(true)} />;
+    return (
+      <SetupPinModal
+        onDone={() => {
+          setPinSet(true);
+          // Sunucu ağacını da tazele: hasPin artık true → başka sayfaya gidip dönünce
+          // kurulum modalı tekrar açılmaz (revalidatePath ile birlikte).
+          router.refresh();
+        }}
+      />
+    );
   }
 
   if (!locked) return null;
