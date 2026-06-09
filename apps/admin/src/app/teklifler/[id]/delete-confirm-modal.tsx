@@ -161,9 +161,10 @@ export function DeleteConfirmModal({
           </button>
         </div>
 
-        {/* İçerik */}
-        <div className="flex flex-col gap-4 overflow-y-auto px-6 py-5">
-          <p id={descId} className="text-sm text-muted-foreground">
+        {/* İçerik — overflow-x-hidden: overflow-y-auto yatay ekseni de "auto" yapıp gereksiz
+            yatay kaydırma çıkarıyordu (CSS davranışı). Yatay taşma kesin engellenir. */}
+        <div className="flex flex-col gap-4 overflow-y-auto overflow-x-hidden px-6 py-5">
+          <p id={descId} className="text-sm break-words text-muted-foreground">
             Bu teklifi kalıcı olarak silmek üzeresiniz. Bu işlem{" "}
             <span className="font-semibold text-destructive">GERİ ALINAMAZ</span>; yüklenen dosyalar
             (varsa) da silinir.
@@ -174,10 +175,10 @@ export function DeleteConfirmModal({
             <span className="text-xs text-muted-foreground">
               Onaylamak için aşağıdaki güvenlik kodunu birebir yazın:
             </span>
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-4 py-3">
+            <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3">
               <span
                 aria-label={`Güvenlik kodu: ${code.split("").join(" ")}`}
-                className="select-none font-mono text-2xl font-bold tracking-[0.35em] text-foreground"
+                className="min-w-0 break-all select-none font-mono text-2xl font-bold tracking-[0.25em] text-foreground"
                 style={{ userSelect: "none" }}
               >
                 {code}
@@ -186,7 +187,7 @@ export function DeleteConfirmModal({
                 type="button"
                 onClick={regenerate}
                 disabled={pending}
-                className={buttonClass("ghost", "sm")}
+                className={cn(buttonClass("ghost", "sm"), "shrink-0")}
               >
                 Yeni kod
               </button>
