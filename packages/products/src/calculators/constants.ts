@@ -81,7 +81,10 @@ export const BES = {
 export const SAGLIK = {
   /** Kaba aylık taban prim (TL) — tahmini. */
   // TODO(doc): Gerçek taban prim ve tüm katsayılar Doğukan'dan / tarifeden gelecek.
-  basePremiumMonthly: 600,
+  // Site sahibi isteğiyle taban 2 KATINA çıkarıldı (600 → 1200); formül (formulas.ts)
+  // lineer olduğundan tüm sağlık prim tahminleri (aylık/yıllık + aralık) iki katına çıkar.
+  // Hâlâ YER TUTUCU / tahmini; sonuç ekranında "Tahmini değerdir" uyarısı korunur.
+  basePremiumMonthly: 1200,
 
   /** Yaşa göre çarpan. Yaş arttıkça prim artar (basit lineer yer tutucu). */
   // TODO(doc): Gerçek yaş-prim eğrisi (yaş bandı tablosu) ile değiştirilecek.

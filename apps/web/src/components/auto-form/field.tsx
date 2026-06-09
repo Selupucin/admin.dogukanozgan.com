@@ -11,6 +11,7 @@ import { cn, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } fro
 import type { ProductField, Locale } from "./types-bridge";
 import { CascadeField } from "./cascade-field";
 import { CaptureGuideModal } from "./capture-guide-modal";
+import { DateField } from "./date-field";
 import { formatPhone, formatTc } from "@/lib/masks";
 
 interface FieldProps {
@@ -97,17 +98,29 @@ function RadioControl({
         >
           <span className="relative inline-flex shrink-0 items-center justify-center">
             <input type="radio" value={o.value} {...register(name)} className="peer sr-only" />
+            {/* Dış halka: seçilmemiş = ince kenar; seçili = belirgin teal (kalın) halka. */}
             <span
               aria-hidden
               className={cn(
                 "flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 border-input bg-card transition-colors",
-                "peer-checked:border-secondary group-hover:border-secondary/70",
+                "peer-checked:border-[2.5px] peer-checked:border-secondary peer-checked:bg-secondary/10",
+                "group-hover:border-secondary/70",
               )}
             >
-              <span className="h-2 w-2 rounded-full bg-secondary opacity-0 transition-opacity peer-checked:opacity-100" />
+              {/* İç nokta: seçili durumda net DOLU teal (büyük + tam opak) → seçim açıkça görünür. */}
+              <span
+                className={cn(
+                  "h-[9px] w-[9px] scale-0 rounded-full bg-secondary opacity-0 transition-all duration-150",
+                  "peer-checked:scale-100 peer-checked:opacity-100",
+                )}
+              />
             </span>
           </span>
-          <span className="text-foreground">{o.label[locale]}</span>
+          {/* Seçili pill zaten bg-accent + teal kenar alır (has-[:checked]); metni de
+              kalınlaştırarak kontrastı artır. */}
+          <span className="text-foreground group-has-[:checked]:font-medium">
+            {o.label[locale]}
+          </span>
         </label>
       ))}
     </div>
@@ -385,13 +398,17 @@ function renderControl({
       );
 
     case "date":
+      // Özel hızlı tarih seçici (DateField): üstte yıl+ay açılır seçimi → gün ızgarası.
+      // Değer ISO YYYY-MM-DD string olarak saklanır (native date input ile aynı payload).
+      // TODO(doc): validation.min/max ile yıl aralığı sınırlanabilir (şimdilik 1920–bugün).
       return (
-        <input
+        <DateField
+          field={field}
+          locale={locale}
+          form={form}
           id={id}
-          type="date"
-          aria-describedby={describedBy}
-          {...register(field.name)}
-          className={cls}
+          describedBy={describedBy}
+          triggerClass={cls}
         />
       );
 
