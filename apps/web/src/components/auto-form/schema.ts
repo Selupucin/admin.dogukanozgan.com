@@ -20,8 +20,8 @@ const messages = {
   },
   plaka: { tr: "Geçerli bir plaka girin", en: "Enter a valid plate" },
   number: { tr: "Geçerli bir sayı girin", en: "Enter a valid number" },
-  min: { tr: "Değer çok küçük", en: "Value is too small" },
-  max: { tr: "Değer çok büyük", en: "Value is too large" },
+  min: { tr: "En az {n} olmalı", en: "Must be at least {n}" },
+  max: { tr: "En fazla {n} olabilir", en: "Must be at most {n}" },
   minLength: { tr: "Çok kısa", en: "Too short" },
   maxLength: { tr: "Çok uzun", en: "Too long" },
   fileSize: { tr: "Dosya boyutu çok büyük", en: "File is too large" },
@@ -61,10 +61,17 @@ function fieldSchema(field: ProductField, locale: Locale): z.ZodTypeAny {
     }
 
     case "number": {
+      // Boş (zorunlu değilse) → undefined; aksi halde sayıya çevirip min/max doğrula.
+      // Hata mesajına sınır değeri gömülür (ör. "En fazla 290 olabilir"). docs/03 §2.
       let s = z.coerce.number({ error: msg("number", locale) });
-      if (v.min !== undefined) s = s.min(v.min, msg("min", locale));
-      if (v.max !== undefined) s = s.max(v.max, msg("max", locale));
-      return field.required ? s : s.optional();
+      if (v.min !== undefined) s = s.min(v.min, msg("min", locale).replace("{n}", String(v.min)));
+      if (v.max !== undefined) s = s.max(v.max, msg("max", locale).replace("{n}", String(v.max)));
+      if (field.required) return s;
+      // Opsiyonel: boş string/undefined'ı undefined'a indirge, doluysa sayı kuralını uygula.
+      return z
+        .union([z.literal(""), z.undefined(), s])
+        .optional()
+        .transform((val) => (val === "" || val === undefined ? undefined : val));
     }
 
     case "email": {

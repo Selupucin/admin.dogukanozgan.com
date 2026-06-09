@@ -98,19 +98,22 @@ function RadioControl({
         >
           <span className="relative inline-flex shrink-0 items-center justify-center">
             <input type="radio" value={o.value} {...register(name)} className="peer sr-only" />
-            {/* Dış halka: seçilmemiş = ince kenar; seçili = belirgin teal (kalın) halka. */}
+            {/* Dış halka: seçilmemiş = ince kenar; seçili = belirgin teal (kalın) halka.
+                Zemin DAİMA bg-card (nötr) kalır → iç teal nokta kart zeminiyle KONTRAST yapar,
+                "boş daire" izlenimi oluşmaz (washed bg-secondary/10 KALDIRILDI). docs/09. */}
             <span
               aria-hidden
               className={cn(
                 "flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 border-input bg-card transition-colors",
-                "peer-checked:border-[2.5px] peer-checked:border-secondary peer-checked:bg-secondary/10",
+                "peer-checked:border-[2.5px] peer-checked:border-secondary",
                 "group-hover:border-secondary/70",
               )}
             >
-              {/* İç nokta: seçili durumda net DOLU teal (büyük + tam opak) → seçim açıkça görünür. */}
+              {/* İç nokta: seçili durumda net DOLU teal — büyük (~10px) + TAM OPAK, nötr kart
+                  zemini üzerinde belirgin → klasik dolu radyo görünümü. Seçilmemiş = nokta yok. */}
               <span
                 className={cn(
-                  "h-[9px] w-[9px] scale-0 rounded-full bg-secondary opacity-0 transition-all duration-150",
+                  "h-[10px] w-[10px] scale-0 rounded-full bg-secondary opacity-0 transition-all duration-150",
                   "peer-checked:scale-100 peer-checked:opacity-100",
                 )}
               />
@@ -124,6 +127,68 @@ function RadioControl({
         </label>
       ))}
     </div>
+  );
+}
+
+// ── Sayı girdisi (boy/kilo vb.). Controller ile KONTROLLÜ: validation.min/max'tan
+// gelen sınırları HEM HTML attribute (min/max) HEM de girişte CLAMP olarak uygular.
+// Sorun: native number input `max` tek başına yazımı engellemez (kullanıcı 1255555
+// yazabilir) → her girişte absürt/aralık dışı değerleri sınırla. docs/03 §2.
+// Kural: sadece rakam (ondalık/negatif yok — boy/kilo tamsayı); değer > max ise max'a
+// indir; < min ise (kullanıcı yazımını bozmamak için) yalnızca max üst sınırı zorlanır
+// ve alan boşaltılabilir (zorunlu değilse). Alt sınır (min) blur'da netleşir + Zod doğrular.
+function NumberControl({
+  name,
+  control,
+  id,
+  placeholder,
+  describedBy,
+  min,
+  max,
+  inputClass: cls,
+}: {
+  name: string;
+  control: UseFormReturn<Record<string, unknown>>["control"];
+  id: string;
+  placeholder?: string;
+  describedBy?: string;
+  min?: number;
+  max?: number;
+  inputClass: string;
+}) {
+  // Ham girişi tamsayıya zorla + üst sınıra clamp et. Boş bırakmaya izin ver.
+  const clamp = (raw: string): string => {
+    // Sadece rakam (ilk işaret/ondalık/boşlukları at). Tamsayı; baştaki 0'ları sadeleştir.
+    const digits = raw.replace(/[^\d]/g, "");
+    if (digits === "") return "";
+    let n = Number.parseInt(digits, 10);
+    if (Number.isNaN(n)) return "";
+    if (max !== undefined && n > max) n = max; // üst sınır: absürt değer engellenir
+    if (min !== undefined && n < 0) n = 0; // negatif zaten oluşmaz; güvenlik
+    return String(n);
+  };
+
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field: rhf }) => (
+        <input
+          id={id}
+          type="number"
+          inputMode="numeric"
+          step={1}
+          min={min}
+          max={max}
+          placeholder={placeholder}
+          aria-describedby={describedBy}
+          value={(rhf.value as string | number | undefined) ?? ""}
+          onChange={(e) => rhf.onChange(clamp(e.target.value))}
+          onBlur={rhf.onBlur}
+          className={cls}
+        />
+      )}
+    />
   );
 }
 
@@ -385,15 +450,18 @@ function renderControl({
       );
 
     case "number":
+      // Kontrollü: validation.min/max → HTML attribute + girişte clamp (absürt değer
+      // engellenir; ör. boy max 290, kilo max 200). docs/03 §2.
       return (
-        <input
+        <NumberControl
+          name={field.name}
+          control={control}
           id={id}
-          type="number"
-          inputMode="numeric"
           placeholder={placeholder}
-          aria-describedby={describedBy}
-          {...register(field.name)}
-          className={cls}
+          describedBy={describedBy}
+          min={field.validation?.min}
+          max={field.validation?.max}
+          inputClass={cls}
         />
       );
 

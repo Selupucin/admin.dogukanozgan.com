@@ -334,7 +334,7 @@ const saglik: ProductDefinition = {
       sensitive: true,
       label: { tr: "Boy (cm)", en: "Height (cm)" },
       placeholder: { tr: "Örn. 175", en: "e.g. 175" },
-      validation: { min: 50, max: 250 },
+      validation: { min: 50, max: 290 },
     },
     {
       name: "kilo",
@@ -343,7 +343,7 @@ const saglik: ProductDefinition = {
       sensitive: true,
       label: { tr: "Kilo (kg)", en: "Weight (kg)" },
       placeholder: { tr: "Örn. 70", en: "e.g. 70" },
-      validation: { min: 20, max: 300 },
+      validation: { min: 20, max: 200 },
     },
     il,
     {
