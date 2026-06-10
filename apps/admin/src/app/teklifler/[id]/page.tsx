@@ -12,6 +12,7 @@ import { StatusControl } from "./status-control";
 import { NoteForm } from "./note-form";
 import { KvkkActions } from "./kvkk-actions";
 import { PolicyDates } from "./policy-dates";
+import { MaskedValue } from "./masked-value";
 
 export const metadata: Metadata = {
   title: "Teklif Detayı — Yönetim",
@@ -21,10 +22,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 /**
- * docs/13 §Y1: Ham blob URL (Asset.url) admin HTML'ine GÖMÜLMEZ. Vercel Blob yalnız
- * `access:"public"` desteklediğinden URL imzasızdır; bunun yerine her dosya auth-gated
- * proxy üzerinden gösterilir → `/dosya/<assetId>` (apps/admin/src/app/dosya/[assetId]).
- * Proxy oturum kontrolü yapar ve içeriği sunucuda stream eder (docs/06 §5b güncel).
+ * docs/13 §Y1: Ham blob URL (Asset.url) admin HTML'ine GÖMÜLMEZ. Dosyalar private blob
+ * olarak saklanır ve yalnız auth-gated proxy üzerinden gösterilir → `/dosya/<assetId>`
+ * (apps/admin/src/app/dosya/[assetId]). Proxy oturum kontrolü yapar ve içeriği sunucuda
+ * stream eder; ham depolama bağlantısı tarayıcıya hiç verilmez (docs/06 §5b güncel).
  */
 function buildAssetViews(assets: { id: string; url: string; kind: string }[]) {
   return {
@@ -163,7 +164,13 @@ export default async function TeklifDetayPage({ params }: { params: Promise<{ id
                           </span>
                         )}
                       </dt>
-                      <dd className="text-sm font-medium">{f.value}</dd>
+                      <dd className="text-sm font-medium">
+                        {f.masked && f.value !== "—" ? (
+                          <MaskedValue value={f.value} label={f.label} />
+                        ) : (
+                          f.value
+                        )}
+                      </dd>
                     </div>
                   ))}
                 </dl>

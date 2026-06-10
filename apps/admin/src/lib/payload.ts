@@ -18,6 +18,11 @@ export interface DisplayField {
   value: string;
   /** Bu alan özel nitelikli (sağlık) mi? UI uyarı işareti için. */
   sensitive: boolean;
+  /**
+   * TC Kimlik No alanı mı? Admin detayında MASKELİ gösterilir (docs/06 §"TC Kimlik No"
+   * → gösterildiği yerlerde maskelenir). UI bu alanı `MaskedValue` ile render eder.
+   */
+  masked: boolean;
 }
 
 /** Tek bir alan değerini, alan tanımına göre okunabilir metne çevirir. */
@@ -86,6 +91,8 @@ export function describePayload(productSlug: string, payload: unknown): DisplayF
         label: field.label.tr,
         value: formatValue(field, data[field.name], data),
         sensitive: Boolean(field.sensitive),
+        // TC Kimlik No → maskeli gösterim (docs/06).
+        masked: field.type === "tcKimlik",
       });
     }
   }
@@ -98,6 +105,7 @@ export function describePayload(productSlug: string, payload: unknown): DisplayF
       label: key,
       value: formatValue(undefined, value, data),
       sensitive: false,
+      masked: false,
     });
   }
 

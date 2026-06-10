@@ -4,10 +4,10 @@
   "globalEnv": [
     "DATABASE_URL",
     "DIRECT_URL",
-    "NEXT_PUBLIC_SUPABASE_URL",
-    "SUPABASE_SERVICE_ROLE_KEY",
     "AUTH_SECRET",
     "BLOB_READ_WRITE_TOKEN",
+    "RESEND_API_KEY",
+    "NEXT_PUBLIC_SITE_URL",
     "ADMIN_EMAIL"
   ],
   "tasks": {

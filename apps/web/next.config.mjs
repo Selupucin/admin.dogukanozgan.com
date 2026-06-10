@@ -54,17 +54,36 @@ const legacyRedirects = [
 ];
 
 // Güvenlik HTTP başlıkları (docs/13 K1). Fetch direktiflerini (script/style/img-src)
-// ZORLAMAYIZ — inline JSON-LD, Next inline style ve analitik kırılmasın diye. Burada
-// yalnızca kırılma riski OLMAYAN, yüksek değerli başlıklar var: clickjacking (frame-ancestors
-// + X-Frame-Options), MIME-sniff (nosniff), HSTS, referrer, permissions, base-uri/object-src.
-// TODO(doc): Tam nonce tabanlı script-src CSP ileride eklenecek (docs/13 K1 takip).
+// kısmen zorlarız; ancak SİTEYİ KIRACAK olanları (script-src) ZORLAMAYIZ — inline JSON-LD,
+// çerez banner'ı inline script'leri (cookie-consent.tsx HIDE_IF_CONSENTED) ve Vercel
+// Analytics/Speed-Insights script'leri nonce/hash gerektirir → riskli. Burada düşük riskli,
+// yüksek değerli kısıtlar var: clickjacking (frame-ancestors + X-Frame-Options), MIME-sniff
+// (nosniff), HSTS+preload, referrer, permissions, base-uri/object-src/form-action.
+//
+// CSP direktifleri:
+//   - base-uri 'self'          : <base> ile taban URL ele geçirme engellenir.
+//   - object-src 'none'        : <object>/<embed> eklenti tabanlı saldırılar kapalı.
+//   - frame-ancestors 'self'   : siteyi yabancı iframe'e gömme (clickjacking) engellenir.
+//   - frame-src https://www.google.com https://maps.google.com https://www.googletagmanager.com
+//                              : İletişim sayfasındaki API-key'siz Google Harita embed
+//                                iframe'i (google.com/maps/embed) çalışmaya devam eder;
+//                                googletagmanager.com → GTM preview/debug iframe'i (onay
+//                                sonrası yüklenen gtm.js, docs/06 §3). script-src yok →
+//                                gtm.js engellenmez; connect-src yok → GA gönderimi engellenmez.
+//   - form-action 'self'       : Form gönderimleri yalnız kendi originimize; veri sızdıran
+//                                3. taraf action enjeksiyonu engellenir (Server Action'lar 'self').
+//   - img-src 'self' data: blob: https:
+//                              : Görseller kırılmasın (next/image, OG, harita statik, data/blob).
+//   - upgrade-insecure-requests: Karışık içerik HTTPS'e yükseltilir.
+// TODO(doc): nonce tabanlı script-src (orta vade) — inline cookie script + Vercel analytics
+//   nedeniyle ertelendi. Eklenmesi için tüm inline script'lerin nonce/hash'lenmesi gerekir.
 const securityHeaders = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains",
+    value: "max-age=63072000; includeSubDomains; preload",
   },
   {
     key: "Permissions-Policy",
@@ -72,7 +91,11 @@ const securityHeaders = [
   },
   {
     key: "Content-Security-Policy",
-    value: "base-uri 'self'; object-src 'none'; frame-ancestors 'self'; upgrade-insecure-requests",
+    value:
+      "base-uri 'self'; object-src 'none'; frame-ancestors 'self'; " +
+      "frame-src https://www.google.com https://maps.google.com https://www.googletagmanager.com; " +
+      "form-action 'self'; img-src 'self' data: blob: https:; " +
+      "upgrade-insecure-requests",
   },
 ];
 

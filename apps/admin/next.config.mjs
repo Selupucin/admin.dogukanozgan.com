@@ -10,16 +10,34 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 // Güvenlik HTTP başlıkları (docs/13 K1). Admin daha KATI: clickjacking tamamen kapalı
-// (DENY + frame-ancestors 'none'), arama motorlarına kapalı (noindex başlığı da). Fetch
-// direktifleri (script/style/img) ZORLANMAZ — Blob foto/inline kırılmasın.
+// (DENY + frame-ancestors 'none'), arama motorlarına kapalı (noindex başlığı da).
+//
+// CSP fetch-direktifleri ZORLANIR. Admin'de inline script yok, fontlar next/font ile
+// self-host, görseller same-origin auth-gated proxy (/dosya) üzerinden blob:/data: →
+// 'self' yeterlidir. style-src'de 'unsafe-inline' Tailwind/Next runtime stilleri için
+// kalır (Next bu noktada style nonce zorlamaz). img-src'de data:/blob: önizleme/proxy için.
 // TODO(doc): Nonce tabanlı script-src CSP ileride (docs/13 K1 takip).
+const csp = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "form-action 'self'",
+  "upgrade-insecure-requests",
+].join("; ");
+
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains",
+    value: "max-age=63072000; includeSubDomains; preload",
   },
   {
     key: "Permissions-Policy",
@@ -27,7 +45,7 @@ const securityHeaders = [
   },
   {
     key: "Content-Security-Policy",
-    value: "base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests",
+    value: csp,
   },
   { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
 ];

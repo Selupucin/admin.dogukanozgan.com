@@ -51,13 +51,14 @@ Husky + lint-staged repoda versiyonlanır (`.husky/`):
 ## Ortam Değişkenleri
 
 Her app ve `packages/db` kendi `.env.example` dosyasını taşır. Gerçek `.env`
-dosyaları **asla commit edilmez** (`.gitignore` kapsar). Değerler Supabase
-projesinden ve Vercel proje ayarlarından gelir. Bkz. `docs/01`.
+dosyaları **asla commit edilmez** (`.gitignore` kapsar). Değerler MongoDB Atlas,
+Vercel Blob ve Vercel proje ayarlarından gelir (K25 — Supabase'ten geçildi).
+Bkz. `docs/01`.
 
 ## Dağıtım (Vercel — İki Ayrı Proje)
 
 Ayrı domain kararı (K21) gereği **iki ayrı Vercel projesi** aynı monorepo'dan
-deploy edilir, **aynı Supabase'i** paylaşır.
+deploy edilir, **aynı MongoDB Atlas + Vercel Blob'u** paylaşır (K25).
 
 | Vercel Projesi       | Root Directory | Domain                           | Notlar                    |
 | -------------------- | -------------- | -------------------------------- | ------------------------- |
@@ -74,15 +75,17 @@ deploy edilir, **aynı Supabase'i** paylaşır.
 4. **Build Command:** `cd ../.. && pnpm --filter @do/<app> build` (vercel.json'da).
 5. **Environment Variables:** ilgili `.env.example` içindeki anahtarlar
    Vercel proje ayarlarına girilir (Production + Preview).
-   - Web: `DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
-     `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`.
-   - Admin: yukarıdakiler + `AUTH_SECRET`, `ADMIN_EMAIL`.
+   - Web: `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`, `NEXT_PUBLIC_SITE_URL`,
+     `RESEND_API_KEY`, `EMAIL_FROM` (opsiyonel: `GOOGLE_SITE_VERIFICATION`,
+     `NEXT_PUBLIC_ANALYTICS_PROVIDER`).
+   - Admin: `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`, `AUTH_SECRET`, `ADMIN_EMAIL`,
+     `RESEND_API_KEY`, `EMAIL_FROM`.
 6. **Domain Bağlama:** Vercel proje → Settings → Domains.
    - Web: `dogukanozgan.com` (apex) + `www.dogukanozgan.com` → apex'e 301.
    - Admin: `admin.dogukanozgan.com` (CNAME → `cname.vercel-dns.com`).
 
-> Açık: Gerçek Supabase projesi ve domain DNS bağlama Aşama 6'da (yayın) yapılır.
-> Aşama 0 yalnızca yapıyı hazırlar.
+> Açık: Gerçek MongoDB Atlas cluster'ı, Vercel Blob store'u ve domain DNS bağlama
+> Aşama 6'da (yayın) yapılır. Aşama 0 yalnızca yapıyı hazırlar.
 
 ## Dökümantasyon
 
