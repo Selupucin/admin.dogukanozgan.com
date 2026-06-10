@@ -2,8 +2,7 @@
 // Kaynak: docs/02 (İletişim Bilgileri), docs/07 (Yerel SEO / NAP tutarlılığı),
 // docs/09 (anlaşmalı şirket güven şeridi).
 //
-// ⚠️ YER TUTUCULAR: Aşağıdaki bazı değerler docs'ta "🔧 netleşecek" işaretli.
-// TODO(doc): Harita koordinatları/Place ID (docs/02) Doğukan'dan gelince güncellenecek.
+// Gerçek ofis konumu/koordinatı Doğukan'dan teyit edildi (2026-06-10, Akplan Sigorta).
 
 /** Birincil iletişim kanalları (docs/02 — teyit edilmiş bilgiler). */
 export const contact = {
@@ -23,15 +22,17 @@ export const contact = {
   },
   /** Tam adres tek satır (NAP — footer/iletişim/JSON-LD tutarlı). */
   fullAddress: "Mecidiyeköy Mah., Büyükdere Cad., Kuğu İş Hanı No:81, Asma Kat 2, Şişli / İstanbul",
+  /** Ofis konumu (Akplan Sigorta Aracılık Hizmetleri) — JSON-LD geo + harita pini. */
+  geo: { lat: 41.066876, lng: 28.9994269 },
 } as const;
 
-/** Google Maps gömme URL'i (adrese göre arama — koordinat gelince değişir).
- *  TODO(doc): Gerçek konum koordinatları/Place ID gelince embed güncellenecek. */
+/** Google Maps gömme URL'i — resmi "Embed a map" (pb=) URL'i; etiketli işletme pini
+ *  (Akplan Sigorta Aracılık Hizmetleri), API key gerektirmez. */
 export const mapEmbedUrl =
-  "https://www.google.com/maps?q=" + encodeURIComponent(contact.fullAddress) + "&output=embed";
+  "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d188.0063525076916!2d28.999446081595785!3d41.06677086891817!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab78273f8de7f%3A0x417e3d042ec12171!2sAkplan%20Sigorta%20Arac%C4%B1l%C4%B1k%20Hizmetleri!5e0!3m2!1str!2sus!4v1781082804145!5m2!1str!2sus";
 
-export const mapLinkUrl =
-  "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(contact.fullAddress);
+/** "Haritada Aç / Yol tarifi" — Doğukan'ın paylaştığı resmi işletme konum linki. */
+export const mapLinkUrl = "https://maps.app.goo.gl/jjxuS7UgeYc7ECrn9";
 
 /**
  * Anlaşmalı sigorta şirketleri (güven şeridi — docs/09).

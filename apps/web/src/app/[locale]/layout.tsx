@@ -121,8 +121,12 @@ export default async function LocaleLayout({
     },
     areaServed: "TR",
     priceRange: "$$",
-    // Harita bağlantısı (docs/07 yerel SEO — hasMap). geo (lat/lng) elimizde yok.
-    // TODO(doc): kesin koordinat gelince `geo` ({ @type:"GeoCoordinates" }) eklenecek.
+    // Ofis koordinatı (docs/07 yerel SEO — GeoCoordinates) + harita bağlantısı (hasMap).
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: contact.geo.lat,
+      longitude: contact.geo.lng,
+    },
     hasMap: mapLinkUrl,
     // docs/07: sosyal profilleri marka-entity ile ilişkilendir (sameAs → yerel SEO).
     sameAs: [social.instagram, social.facebook, social.linkedin],
