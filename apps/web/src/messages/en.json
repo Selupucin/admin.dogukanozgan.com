@@ -399,5 +399,14 @@
       "goldBody": "By placing your savings in gold- or FX-indexed products, you can aim to protect your money's purchasing power against inflation over the long term. We determine the suitable product and rates together.",
       "vergiNotice": "The tax-advantage estimate relies on a simplified assumption; actual income-tax deduction rates and caps vary by legislation and your situation. Consult your accountant / the quote process for the exact amount."
     }
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "body": "The page you are looking for may have moved, been renamed, or never existed. Use the options below to continue where you left off.",
+    "back": "Go back",
+    "home": "Back to home",
+    "popularLabel": "Popular links",
+    "linkPlans": "Insurance Products",
+    "linkFaq": "Frequently Asked Questions"
   }
 }

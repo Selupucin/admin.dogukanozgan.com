@@ -399,5 +399,14 @@
       "goldBody": "Birikiminizi altın veya dövize endeksli ürünlerle değerlendirerek, uzun vadede paranızın alım gücünü enflasyona karşı korumayı hedefleyebilirsiniz. Uygun ürün ve oranları birlikte belirleriz.",
       "vergiNotice": "Vergi avantajı tahmini, basitleştirilmiş bir varsayıma dayanır; gerçek gelir vergisi indirim oranları ve üst sınırları mevzuata ve durumunuza göre değişir. Kesin tutar için mali müşavirinize / teklif sürecine danışın."
     }
+  },
+  "notFound": {
+    "heading": "Sayfa bulunamadı",
+    "body": "Aradığınız sayfa taşınmış, adı değişmiş ya da hiç var olmamış olabilir. Aşağıdaki seçeneklerle kaldığınız yerden devam edebilirsiniz.",
+    "back": "Geri dön",
+    "home": "Anasayfaya dön",
+    "popularLabel": "Popüler bağlantılar",
+    "linkPlans": "Sigorta Ürünleri",
+    "linkFaq": "Sıkça Sorulanlar"
   }
 }
