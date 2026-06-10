@@ -8,7 +8,7 @@
 // SEO: not-found.tsx HTTP 404 statüsü döndürür; sitemap'e EKLENMEZ, indekslenmez.
 
 import type { Metadata } from "next";
-import Link from "next/link";
+import { RootNotFoundActions } from "@/components/root-not-found-actions";
 
 export const metadata: Metadata = {
   title: "Sayfa bulunamadı — Doğukan Özgan",
@@ -21,6 +21,7 @@ export default function RootNotFound() {
       <body
         style={{
           margin: 0,
+          boxSizing: "border-box",
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
@@ -48,20 +49,7 @@ export default function RootNotFound() {
             We couldn&apos;t find that page. Return to the homepage to continue.
           </span>
         </p>
-        <Link
-          href="/tr"
-          style={{
-            display: "inline-block",
-            borderRadius: "9999px",
-            backgroundColor: "#f25a32",
-            color: "#fffdf8",
-            padding: "0.875rem 1.5rem",
-            fontWeight: 700,
-            textDecoration: "none",
-          }}
-        >
-          Anasayfaya dön / Home
-        </Link>
+        <RootNotFoundActions />
       </body>
     </html>
   );
