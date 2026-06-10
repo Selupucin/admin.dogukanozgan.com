@@ -53,6 +53,9 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       postalCode: contact.address.postalCode,
       addressCountry: contact.address.country,
     },
+    // Harita bağlantısı (docs/07 yerel SEO — hasMap). geo (lat/lng) elimizde yok.
+    // TODO(doc): kesin koordinat gelince `geo` ({ @type:"GeoCoordinates" }) eklenecek.
+    hasMap: mapLinkUrl,
     // docs/07: marka-entity sosyal profilleri (sameAs → yerel SEO).
     sameAs: [social.instagram, social.facebook, social.linkedin],
   };

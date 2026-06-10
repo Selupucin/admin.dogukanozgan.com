@@ -102,6 +102,11 @@
     "finalTitle": "Which insurance do you need?",
     "finalSubtitle": "Pick a branch and get a free quote from the product page in minutes."
   },
+  "breadcrumb": {
+    "home": "Home",
+    "plans": "Insurance Products",
+    "quote": "Get a Quote"
+  },
   "productPage": {
     "leadEyebrow": "Overview",
     "calculatorTitle": "Calculate right away",

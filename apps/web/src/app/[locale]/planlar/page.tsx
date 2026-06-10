@@ -11,11 +11,11 @@ import { getAllProducts, getLocalizedSlug } from "@do/products";
 import { ArrowRight, Calculator, Scale, Gift, HeartHandshake } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { localizedAlternates } from "@/lib/seo";
+import { localizedAlternates, jsonLdHtml, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { ProductIcon } from "@/components/product-icon";
 import { FaqAccordion } from "@/components/faq-accordion";
 import { getProductContent } from "@/lib/product-content";
-import { partnerCompanies } from "@/lib/site";
+import { partnerCompanies, siteUrl } from "@/lib/site";
 
 type Locale = (typeof routing.locales)[number];
 
@@ -43,7 +43,15 @@ export default async function PlansPage({ params }: { params: Promise<{ locale: 
   setRequestLocale(locale);
   const loc = locale as Locale;
   const t = await getTranslations("plans");
+  const tb = await getTranslations("breadcrumb");
   const products = getAllProducts();
+
+  // BreadcrumbList JSON-LD (docs/07): Anasayfa → Sigorta Ürünleri (mevcut sayfa).
+  const plansPath = loc === "tr" ? "planlar" : "plans";
+  const breadcrumbLd = buildBreadcrumbJsonLd([
+    { name: tb("home"), item: `${siteUrl}/${loc}` },
+    { name: tb("plans"), item: `${siteUrl}/${loc}/${plansPath}` },
+  ]);
 
   const why = [
     { icon: Scale, title: t("why1Title"), body: t("why1Body") },
@@ -61,6 +69,10 @@ export default async function PlansPage({ params }: { params: Promise<{ locale: 
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbLd) }}
+      />
       {/* FAQPage JSON-LD KALDIRILDI (docs/07 D2): aynı FAQPage yapısal verisi anasayfada
           ve /sss'te var; mükerrer yapısal veriyi önlemek için burada YALNIZ görsel
           akordeon gösterilir (yapısal veri yok). */}

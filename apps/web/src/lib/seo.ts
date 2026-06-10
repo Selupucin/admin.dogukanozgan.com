@@ -26,6 +26,27 @@ export function jsonLdHtml(obj: unknown): string {
 }
 
 /**
+ * BreadcrumbList JSON-LD üretir (docs/07 — kırıntı navigasyon yapısal verisi).
+ * Google'da kırıntı zinciri zengin sonucu için. `item` ABSOLUTE URL olmalıdır
+ * (siteUrl + yerel yol). Son öğenin `item`'i opsiyoneldir (mevcut sayfa). Çıktı
+ * `jsonLdHtml` ile güvenle `<script>`'e basılır.
+ *
+ * @param items Sıralı kırıntı öğeleri: { name, item? } — kök → mevcut sayfa.
+ */
+export function buildBreadcrumbJsonLd(items: { name: string; item?: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: it.name,
+      ...(it.item ? { item: it.item } : {}),
+    })),
+  };
+}
+
+/**
  * Bir kanonik pathname için canonical (aktif locale) + hreflang (tüm locale +
  * x-default) alternates bloğu üretir.
  *

@@ -102,6 +102,11 @@
     "finalTitle": "Hangi sigortaya ihtiyacınız var?",
     "finalSubtitle": "Branşı seçin, ürün sayfasından dakikalar içinde ücretsiz teklif alın."
   },
+  "breadcrumb": {
+    "home": "Anasayfa",
+    "plans": "Sigorta Ürünleri",
+    "quote": "Teklif Al"
+  },
   "productPage": {
     "leadEyebrow": "Genel Bakış",
     "calculatorTitle": "Hemen hesaplayın",

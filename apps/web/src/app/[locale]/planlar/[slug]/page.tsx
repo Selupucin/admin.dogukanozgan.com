@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { localizedAlternates, jsonLdHtml } from "@/lib/seo";
+import { localizedAlternates, jsonLdHtml, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 import { getProductContent } from "@/lib/product-content";
 import { ProductIcon } from "@/components/product-icon";
@@ -77,6 +77,7 @@ export default async function ProductPage({
 
   const t = await getTranslations("productPage");
   const tp = await getTranslations("plans");
+  const tb = await getTranslations("breadcrumb");
   // Tanıtım içeriği (kapsam/avantaj/ürün SSS) — YER TUTUCU (lib/product-content).
   const content = getProductContent(product.slug);
 
@@ -93,6 +94,13 @@ export default async function ProductPage({
     url: `${siteUrl}/${localizedPath}`,
     provider: { "@type": "InsuranceAgency", name: "Doğukan Özgan" },
   };
+  // BreadcrumbList JSON-LD (docs/07): Anasayfa → Sigorta Ürünleri → [Ürün].
+  const plansPath = loc === "tr" ? "planlar" : "plans";
+  const breadcrumbLd = buildBreadcrumbJsonLd([
+    { name: tb("home"), item: `${siteUrl}/${loc}` },
+    { name: tb("plans"), item: `${siteUrl}/${loc}/${plansPath}` },
+    { name: product.name[loc], item: `${siteUrl}/${localizedPath}` },
+  ]);
   const faqLd =
     content && content.faq.length > 0
       ? {
@@ -263,6 +271,10 @@ export default async function ProductPage({
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(serviceLd) }}

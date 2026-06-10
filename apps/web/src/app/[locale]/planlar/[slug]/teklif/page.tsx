@@ -12,7 +12,8 @@ import { Suspense } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { localizedAlternates } from "@/lib/seo";
+import { localizedAlternates, jsonLdHtml, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
 import { PrefilledAutoForm } from "@/components/auto-form";
 import { ProductIcon } from "@/components/product-icon";
 
@@ -66,11 +67,28 @@ export default async function QuotePage({
 
   const t = await getTranslations("quotePage");
   const tp = await getTranslations("plans");
+  const tb = await getTranslations("breadcrumb");
+
+  // BreadcrumbList JSON-LD (docs/07): Anasayfa → Sigorta Ürünleri → [Ürün] → Teklif.
+  // Her locale KENDİ yerel yol/slug'ını kullanır (tr: planlar/<slug>/teklif,
+  // en: plans/<slug>/quote). product slug'ı bu locale'in YEREL slug'ıdır.
+  const plansPath = loc === "tr" ? "planlar" : "plans";
+  const quotePath = loc === "tr" ? "teklif" : "quote";
+  const breadcrumbLd = buildBreadcrumbJsonLd([
+    { name: tb("home"), item: `${siteUrl}/${loc}` },
+    { name: tb("plans"), item: `${siteUrl}/${loc}/${plansPath}` },
+    { name: product.name[loc], item: `${siteUrl}/${loc}/${plansPath}/${slug}` },
+    { name: tb("quote"), item: `${siteUrl}/${loc}/${plansPath}/${slug}/${quotePath}` },
+  ]);
 
   // Hesaplayıcıdan gelen ön-doldurma değerleri URL query'sinden CLIENT'ta okunur
   // (PrefilledAutoForm). Böylece sayfa SUNUCUDA STATİK (SSG) kalır.
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbLd) }}
+      />
       {/* Tanım sayfasına geri link */}
       <Link
         href={{ pathname: "/planlar/[slug]", params: { slug } }}

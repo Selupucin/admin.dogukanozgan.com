@@ -14,14 +14,15 @@ export const contact = {
   whatsapp: "905465272882",
   email: "dogukanozgan@akplansigorta.com.tr",
   address: {
-    street: "Mecidiyeköy Mah. Büyükdere Cad. Kuğu İş Hanı No:81 D:4",
+    // Gerçek ofis adresi (Doğukan onayladı, 2026-06-10) — Akplan Sigorta bünyesinde.
+    street: "Büyükdere Cad. Kuğu İş Hanı No:81 Asma Kat 2",
     district: "Şişli",
     city: "İstanbul",
     country: "TR",
     postalCode: "34387",
   },
-  /** Tam adres tek satır. */
-  fullAddress: "Mecidiyeköy Mah. Büyükdere Cad. Kuğu İş Hanı No:81 D:4, Şişli/İstanbul",
+  /** Tam adres tek satır (NAP — footer/iletişim/JSON-LD tutarlı). */
+  fullAddress: "Mecidiyeköy Mah., Büyükdere Cad., Kuğu İş Hanı No:81, Asma Kat 2, Şişli / İstanbul",
 } as const;
 
 /** Google Maps gömme URL'i (adrese göre arama — koordinat gelince değişir).
