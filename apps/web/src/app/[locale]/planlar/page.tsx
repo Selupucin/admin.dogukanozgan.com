@@ -73,7 +73,7 @@ export default async function PlansPage({ params }: { params: Promise<{ locale: 
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
           <div className="max-w-2xl">
-            <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("eyebrow")}
             </span>
             <h1 className="mt-3 font-heading text-[clamp(2.2rem,4.5vw,3.4rem)] font-semibold leading-[1.07] tracking-tight text-foreground">
@@ -88,7 +88,7 @@ export default async function PlansPage({ params }: { params: Promise<{ locale: 
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="max-w-2xl">
-            <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("whyEyebrow")}
             </span>
             <h2 className="mt-3 font-heading text-[clamp(1.7rem,3vw,2.3rem)] font-semibold text-foreground">
@@ -161,7 +161,7 @@ export default async function PlansPage({ params }: { params: Promise<{ locale: 
                         ))}
                       </ul>
                     )}
-                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-primary">
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-destructive">
                       {t("detailsCta")}
                       <ArrowRight
                         className="h-4 w-4 transition group-hover:translate-x-1"
@@ -180,7 +180,7 @@ export default async function PlansPage({ params }: { params: Promise<{ locale: 
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("stepsEyebrow")}
             </span>
             <h2 className="mt-3 font-heading text-[clamp(1.7rem,3vw,2.3rem)] font-semibold text-foreground">
@@ -190,7 +190,7 @@ export default async function PlansPage({ params }: { params: Promise<{ locale: 
           <ol className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3">
             {steps.map((s, i) => (
               <li key={i}>
-                <span className="font-heading text-5xl font-semibold leading-none text-primary/85">
+                <span className="font-heading text-5xl font-semibold leading-none text-destructive">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-3 font-heading text-xl text-foreground">{s.t}</h3>
@@ -225,7 +225,7 @@ export default async function PlansPage({ params }: { params: Promise<{ locale: 
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div className="text-center">
-            <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("faqEyebrow")}
             </span>
             <h2 className="mt-3 font-heading text-[clamp(1.7rem,3vw,2.3rem)] font-semibold text-foreground">

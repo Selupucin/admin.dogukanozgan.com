@@ -39,7 +39,7 @@ export function CookieConsentActions() {
       <button
         type="button"
         onClick={(e) => choose("all", e)}
-        className="rounded-pill bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:-translate-y-0.5"
+        className="rounded-pill bg-destructive px-4 py-2 text-sm font-medium text-white transition hover:-translate-y-0.5"
       >
         {t("accept")}
       </button>

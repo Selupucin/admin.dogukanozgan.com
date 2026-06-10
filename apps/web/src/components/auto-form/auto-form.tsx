@@ -344,8 +344,8 @@ export function AutoForm({ product, locale, defaultValues }: AutoFormProps) {
           type="button"
           onClick={goToStep2}
           className={cn(
-            "inline-flex items-center justify-center gap-2 rounded-pill bg-primary px-6 py-3 font-medium text-primary-foreground",
-            "transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+            "inline-flex items-center justify-center gap-2 rounded-pill bg-destructive px-6 py-3 font-medium text-white",
+            "transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
           )}
         >
           {t("steps.next")}
@@ -370,8 +370,8 @@ export function AutoForm({ product, locale, defaultValues }: AutoFormProps) {
             type="submit"
             disabled={form.formState.isSubmitting}
             className={cn(
-              "inline-flex flex-1 items-center justify-center rounded-pill bg-primary px-6 py-3 font-medium text-primary-foreground",
-              "transition hover:-translate-y-0.5 hover:bg-destructive disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+              "inline-flex flex-1 items-center justify-center rounded-pill bg-destructive px-6 py-3 font-medium text-white",
+              "transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
             )}
           >
             {form.formState.isSubmitting ? t("submitting") : t("submit")}

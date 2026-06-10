@@ -28,7 +28,7 @@ export function NotFoundActions() {
       <button
         type="button"
         onClick={goBack}
-        className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="inline-flex items-center justify-center gap-2 rounded-full bg-destructive px-6 py-3.5 text-base font-bold text-white transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <ArrowLeft className="h-5 w-5" aria-hidden />
         {t("back")}

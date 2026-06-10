@@ -82,7 +82,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
 
       <header className="max-w-2xl">
-        <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+        <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
           {t("eyebrow")}
         </span>
         <h1 className="mt-3 font-heading text-[clamp(2.2rem,4.5vw,3.2rem)] font-semibold tracking-tight text-foreground">
@@ -127,7 +127,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
               href={mapLinkUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-destructive"
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)]"
             >
               <MapPin className="h-4 w-4" aria-hidden />
               {t("openMap")}

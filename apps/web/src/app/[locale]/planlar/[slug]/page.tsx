@@ -129,7 +129,7 @@ export default async function ProductPage({
             <span className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/15 text-secondary">
               <Sparkles className="h-5 w-5" aria-hidden />
             </span>
-            <span className="relative mt-5 block text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="relative mt-5 block text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("leadEyebrow")}
             </span>
             <p className="relative mt-3 font-heading text-[clamp(1.15rem,2.2vw,1.5rem)] font-medium leading-relaxed text-foreground">
@@ -145,7 +145,7 @@ export default async function ProductPage({
     product.hasCalculator && product.calculator ? (
       <section id="hesaplayici" className="scroll-mt-24 py-14 sm:py-16">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+          <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
             {t("calculatorEyebrow")}
           </span>
           <h2 className="mt-3 font-heading text-[clamp(1.7rem,3vw,2.3rem)] font-semibold text-foreground">
@@ -163,7 +163,7 @@ export default async function ProductPage({
     content && content.coverage.length > 0 ? (
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+          <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
             {t("coverageEyebrow")}
           </span>
           <h2 className="mt-3 font-heading text-[clamp(1.7rem,3vw,2.3rem)] font-semibold text-foreground">
@@ -189,7 +189,7 @@ export default async function ProductPage({
     content && content.advantages.length > 0 ? (
       <section className="bg-muted/60 py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+          <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
             {t("advantagesEyebrow")}
           </span>
           <h2 className="mt-3 font-heading text-[clamp(1.7rem,3vw,2.3rem)] font-semibold text-foreground">
@@ -214,7 +214,7 @@ export default async function ProductPage({
   const whyBlock = (
     <section className="bg-muted/60 py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+        <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
           {t("whyEyebrow")}
         </span>
         <h2 className="mt-3 font-heading text-[clamp(1.7rem,3vw,2.3rem)] font-semibold text-foreground">
@@ -241,7 +241,7 @@ export default async function ProductPage({
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div className="text-center">
-            <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("faqEyebrow")}
             </span>
             <h2 className="mt-3 font-heading text-[clamp(1.7rem,3vw,2.3rem)] font-semibold text-foreground">
@@ -301,7 +301,7 @@ export default async function ProductPage({
             <div className="mt-8 flex flex-wrap gap-3.5">
               <Link
                 href={{ pathname: "/planlar/[slug]/teklif", params: { slug } }}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground shadow-[0_10px_24px_-10px_hsl(var(--destructive))] transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="inline-flex items-center gap-2 rounded-full bg-destructive px-6 py-3.5 text-base font-bold text-white shadow-[0_10px_24px_-10px_hsl(var(--destructive))] transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 {t("getQuote")}
                 <ArrowRight className="h-5 w-5" aria-hidden />
@@ -339,7 +339,7 @@ export default async function ProductPage({
           <div className="relative mt-8">
             <Link
               href={{ pathname: "/planlar/[slug]/teklif", params: { slug } }}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+              className="inline-flex items-center gap-2 rounded-full bg-destructive px-7 py-3.5 text-base font-bold text-white transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
             >
               {t("getQuote")}
               <ArrowRight className="h-5 w-5" aria-hidden />

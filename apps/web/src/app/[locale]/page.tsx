@@ -81,7 +81,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <div className="reveal reveal-4 mt-7 flex flex-wrap items-center gap-3.5">
               <Link
                 href="/planlar"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground shadow-[0_10px_24px_-10px_hsl(var(--destructive))] transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="inline-flex items-center gap-2 rounded-full bg-destructive px-6 py-3.5 text-base font-bold text-white shadow-[0_10px_24px_-10px_hsl(var(--destructive))] transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 {t("heroCtaPrimary")}
                 <ArrowRight className="h-5 w-5" aria-hidden />
@@ -98,10 +98,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
             <dl className="reveal reveal-5 mt-10 flex flex-wrap gap-x-10 gap-y-5">
               {stats.map((s) => (
-                <div key={s.label}>
-                  <dt className="sr-only">{s.label}</dt>
-                  <dd className="font-heading text-3xl leading-none text-foreground">{s.value}</dd>
-                  <span className="text-sm font-semibold text-muted-foreground">{s.label}</span>
+                <div key={s.label} className="flex flex-col">
+                  <dt className="order-2 text-sm font-semibold text-muted-foreground">{s.label}</dt>
+                  <dd className="order-1 font-heading text-3xl leading-none text-foreground">
+                    {s.value}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -136,7 +137,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section id="branslar" className="py-20 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="max-w-2xl">
-            <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("branchesEyebrow")}
             </span>
             <h2 className="mt-3 font-heading text-[clamp(2rem,3.6vw,2.7rem)] font-semibold text-foreground">
@@ -184,7 +185,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section className="bg-muted/60 py-20 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("stepsEyebrow")}
             </span>
             <h2 className="mt-3 font-heading text-[clamp(2rem,3.6vw,2.7rem)] font-semibold text-foreground">
@@ -194,7 +195,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <ol className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-3">
             {steps.map((s, i) => (
               <li key={i}>
-                <span className="font-heading text-5xl font-semibold leading-none text-primary/85">
+                <span className="font-heading text-5xl font-semibold leading-none text-destructive">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-3 font-heading text-xl text-foreground">{s.t}</h3>
@@ -209,7 +210,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section id="sss" className="py-20 sm:py-24">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div className="text-center">
-            <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+            <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
               {t("faqEyebrow")}
             </span>
             <h2 className="mt-3 font-heading text-[clamp(2rem,3.6vw,2.7rem)] font-semibold text-foreground">
@@ -242,7 +243,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="relative mt-8 flex flex-wrap justify-center gap-3.5">
             <Link
               href="/planlar"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+              className="inline-flex items-center gap-2 rounded-full bg-destructive px-7 py-3.5 text-base font-bold text-white transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
             >
               {tc("getQuote")}
               <ArrowRight className="h-5 w-5" aria-hidden />

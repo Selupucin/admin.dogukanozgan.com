@@ -234,8 +234,8 @@ export function CaptureGuideModal({ locale, onConfirm, onClose }: CaptureGuideMo
             type="button"
             onClick={onConfirm}
             className={cn(
-              "inline-flex w-full items-center justify-center gap-2 rounded-pill bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition",
-              "hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+              "inline-flex w-full items-center justify-center gap-2 rounded-pill bg-destructive px-6 py-3 text-sm font-bold text-white transition",
+              "hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
             )}
           >
             <Camera className="h-4 w-4" aria-hidden />

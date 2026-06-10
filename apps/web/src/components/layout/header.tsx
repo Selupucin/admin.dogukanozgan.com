@@ -55,7 +55,7 @@ export function Header() {
           <ThemeToggle />
           <Link
             href="/planlar"
-            className="hidden rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-[0_10px_24px_-10px_hsl(var(--destructive))] transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:inline-flex"
+            className="hidden rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_24px_-10px_hsl(var(--destructive))] transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:inline-flex"
           >
             {tc("getQuote")}
           </Link>
@@ -93,7 +93,7 @@ export function Header() {
             <Link
               href="/planlar"
               onClick={() => setOpen(false)}
-              className="mt-2 rounded-full bg-primary px-5 py-3 text-center text-base font-bold text-primary-foreground transition hover:bg-destructive"
+              className="mt-2 rounded-full bg-destructive px-5 py-3 text-center text-base font-bold text-white transition hover:bg-[hsl(9_84%_38%)]"
             >
               {tc("getQuote")}
             </Link>

@@ -74,7 +74,7 @@ export function StatusLookup({ initialCode = "" }: { initialCode?: string }) {
         <button
           type="submit"
           disabled={loading || code.trim().length < 4}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:translate-y-0 disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-destructive px-6 py-3.5 text-base font-bold text-white transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:translate-y-0 disabled:opacity-60"
         >
           <Search className="h-5 w-5" aria-hidden />
           {loading ? t("submitting") : t("submit")}

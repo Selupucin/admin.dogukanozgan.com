@@ -152,7 +152,7 @@ function VefatMode({
         <button
           type="button"
           onClick={() => onUseValues({ teminatTutari: coverage, sure: years, sigara: smoker })}
-          className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-pill bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:-translate-y-0.5 hover:bg-destructive sm:w-auto"
+          className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-pill bg-destructive px-5 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] sm:w-auto"
         >
           {t("useInForm")}
         </button>

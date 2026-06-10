@@ -70,7 +70,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           className="pointer-events-none absolute -right-32 -top-36 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle_at_30%_30%,hsl(177_60%_27%/0.16),transparent_65%)]"
         />
         <div className="relative mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:py-20">
-          <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+          <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
             {t("eyebrow")}
           </span>
           <h1 className="mt-3 font-heading text-[clamp(2.2rem,4.5vw,3.2rem)] font-semibold tracking-tight text-foreground">
@@ -167,7 +167,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           <ol className="mt-8 grid grid-cols-1 gap-10 md:grid-cols-3">
             {steps.map((s, i) => (
               <li key={i}>
-                <span className="font-heading text-5xl font-semibold leading-none text-primary/85">
+                <span className="font-heading text-5xl font-semibold leading-none text-destructive">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-3 font-heading text-lg text-foreground">{s.t}</h3>
@@ -203,7 +203,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           <div className="mt-6 flex flex-wrap gap-3.5">
             <Link
               href="/planlar"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-base font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="inline-flex items-center gap-2 rounded-full bg-destructive px-6 py-3.5 text-base font-bold text-white transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {tc("getQuote")}
               <ArrowRight className="h-5 w-5" aria-hidden />

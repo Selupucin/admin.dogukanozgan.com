@@ -54,7 +54,7 @@ export default async function FaqPage({ params }: { params: Promise<{ locale: st
       />
 
       <header className="max-w-2xl">
-        <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+        <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
           {t("eyebrow")}
         </span>
         <h1 className="mt-3 font-heading text-[clamp(2.2rem,4.5vw,3.2rem)] font-semibold tracking-tight text-foreground">
@@ -87,7 +87,7 @@ export default async function FaqPage({ params }: { params: Promise<{ locale: st
         <div className="mt-6 flex flex-wrap justify-center gap-3.5">
           <Link
             href="/iletisim"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            className="inline-flex items-center gap-2 rounded-full bg-destructive px-6 py-3 text-base font-bold text-white transition hover:-translate-y-0.5 hover:bg-[hsl(9_84%_38%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
             {t("ctaButton")}
             <ArrowRight className="h-5 w-5" aria-hidden />

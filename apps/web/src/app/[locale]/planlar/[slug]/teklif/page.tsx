@@ -85,7 +85,7 @@ export default async function QuotePage({
           <ProductIcon name={product.icon} className="h-6 w-6" />
         </span>
         <div>
-          <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-primary">
+          <span className="text-xs font-extrabold uppercase tracking-[0.1em] eyebrow">
             {t("eyebrow")}
           </span>
           <h1 className="mt-1 font-heading text-[clamp(1.8rem,3.6vw,2.6rem)] font-semibold leading-tight tracking-tight text-foreground">
