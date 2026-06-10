@@ -12,21 +12,17 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 // Güvenlik HTTP başlıkları (docs/13 K1). Admin daha KATI: clickjacking tamamen kapalı
 // (DENY + frame-ancestors 'none'), arama motorlarına kapalı (noindex başlığı da).
 //
-// CSP fetch-direktifleri ZORLANIR. Admin'de inline script yok, fontlar next/font ile
-// self-host, görseller same-origin auth-gated proxy (/dosya) üzerinden blob:/data: →
-// 'self' yeterlidir. style-src'de 'unsafe-inline' Tailwind/Next runtime stilleri için
-// kalır (Next bu noktada style nonce zorlamaz). img-src'de data:/blob: önizleme/proxy için.
-// TODO(doc): Nonce tabanlı script-src CSP ileride (docs/13 K1 takip).
+// CSP — clickjacking/object/base kapalı + form-action kısıtlı. NOT: `script-src 'self'`
+// EKLENMEZ; Next.js App Router kendi inline bootstrap/hydration script'lerini
+// (self.__next_f.push, RSC stream) inline enjekte eder → nonce/'unsafe-inline' olmadan
+// CSP bunları engeller ve sayfa boş gelir (deneyimlendi, 2026-06-10). Bu yüzden script-src
+// şimdilik kısıtlanmıyor (web ile aynı yaklaşım).
+// TODO(doc): Nonce tabanlı script-src CSP (middleware ile, Next nonce'u otomatik uygular) — ileride.
 const csp = [
-  "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
-  "script-src 'self'",
-  "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
-  "font-src 'self'",
-  "connect-src 'self'",
   "form-action 'self'",
   "upgrade-insecure-requests",
 ].join("; ");
